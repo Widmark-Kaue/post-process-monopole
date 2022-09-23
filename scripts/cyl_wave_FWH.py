@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.special import hankel2
 from pathlib import Path
 #%% Caminhos
-PATH_DATA   = Path('/home/labcc/Github/post-process-monopole/data')
+PATH_DATA   = Path().absolute().parent / 'data'
+print(PATH_DATA)
 PROBES      = PATH_DATA / 'probes' / '0'
 FWH         = PATH_DATA / 'pressureData' 
 

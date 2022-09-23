@@ -1,3 +1,22 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:48ef2948926e4f052d9f9681a8c8826fd77f45ddf98b4b6a8d8804c162554e8d
-size 473
+[tool.poetry]
+name = "post-process-monopole"
+version = "0.1.0"
+description = ""
+authors = ["Widmark Kauê <widmarkkaue.s.c@gmail.com>"]
+readme = "README.md"
+packages = [{include = "post_process_monopole"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+numpy = "^1.23.3"
+matplotlib = "^3.6.0"
+scipy = "^1.9.1"
+jupyter = "^1.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+blue = "^0.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

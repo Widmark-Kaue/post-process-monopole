@@ -1,8 +1,11 @@
 #%% Librarys
+from cProfile import label
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 from scipy.special import hankel2
+from scipy.integrate import trapz
+
 #%% FUNÇÕES
 def pressure(r:float or np.ndarray = None, 
             t:float or np.ndarray = None) -> float or np.ndarray:
@@ -57,13 +60,30 @@ def importData(simulation:str, probe:int=2, time:float = None)-> tuple:
 
 
 def rms(tp:tuple, pfunc:any, r:int, 
-        freq:float = 100, c0:float = 340.29):
+        freq:float = 100, c0:float = 340.29, plot: bool = True):
         
     
-    t, p = tp
-    transientTime = r/c0 +5/freq
-    # filter = lambda x: x >= transientTime
-    efectiveTime = np.array([k if k >= transientTime else -1 for k in t])
+    t, p                = tp
+    transientTime       = r/c0 +5/freq
+    fil                 = lambda x: x >= transientTime
+    efectiveTime        = np.array(list(filter(fil, t)))
+    efectivePressure    = np.array([p[t.index(i)] for i in efectiveTime]) 
+
+    #% Plot
+    if plot:
+        plt.plot(efectiveTime, pfunc(efectiveTime), 'k-', label = 'Analítico')
+        plt.plot(efectiveTime, efectivePressure, 'r-', label = 'Direto')
+        plt.xlabel('Tempo [s]')
+        plt.ylabel('Pressão [Pa]')
+        plt.legend()
+        plt.grid()
+        plt.show()
+    
+    #% RMS
+    aux1    = (p - pfunc(efectiveTime))**2
+    rms     = trapz(aux1, efectiveTime)/trapz(pfunc(efectiveTime), efectiveTime)
+    
+    return rms  
 
 
 def plotTime(FWH:tuple, SIM:tuple, fanalitic:any) -> None:

@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from scipy.integrate import trapz
 from scipy.special import hankel2
 
-#%% FUNÇÕES
 def pressure(r:float or np.ndarray = None, 
             t:float or np.ndarray = None) -> float or np.ndarray:
     rf          = 0.05715 / 2

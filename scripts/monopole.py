@@ -26,3 +26,5 @@ wv.plotSpacial((pfwh,pfwh2), p, r = microphone, tobs=0.5, title=ti)
 RMS = wv.rmsTime(SIM, r = microphone[2])*100
 print(RMS)
 
+
+# %%

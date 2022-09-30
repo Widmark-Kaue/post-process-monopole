@@ -37,8 +37,6 @@ def pressure(r:float or np.ndarray = None,
     else:
         return p_2_E(t,r)
 
-
-
 def importData(simulation:str, probe:int=2, time:float = None)-> tuple:
     
     assert 0<= probe <= 10, 'ERRO: O valor da probe deve estar entre 0 e 10'
@@ -67,7 +65,6 @@ def importData(simulation:str, probe:int=2, time:float = None)-> tuple:
 
         print(f'Time = {tp[pos]} \nPos = {pos}')
         return (p - toPa, pfwh, pfwh)
-
 
 def rmsTime(tp:tuple, robs:float, freq:float = 100, 
             c0:float = 340.29, plot: bool = True)-> float:

@@ -29,6 +29,6 @@ def microphones(number_of_observer:int = 30, lim:tuple = (2,102),
         file.write('}')
 
 #%% Run
-probes()
-microphones()
+probes(number_of_probes=20)
+microphones(number_of_observer=20)
 # %%

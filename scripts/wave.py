@@ -18,6 +18,7 @@ def pressure(r:float or np.ndarray = None,
     rho0        = 101325 / (287.058 * T) #% Eq. dos Gases ideias
     area        = 2 * np.pi * rf
     velocity    = S / area
+    Lambda      = c/freq
 
     H_1_fonte_J = hankel2(1, (omega * rf / c0))
     A0          = velocity*1j*rho0*c0/H_1_fonte_J
@@ -27,15 +28,15 @@ def pressure(r:float or np.ndarray = None,
     p_2_E       = lambda t1,r1: (P_2_E(r1)*np.exp(1j*omega*t1)).imag
     
     if r == None and t == None:
-        return p_2_E
+        return p_2_E, Lambda
     elif any(i != None for i in [t,r]):
         aux     = t == None
         if t == None:
-            return lambda t1: p_2_E(t1,r1=r)
+            return lambda t1: p_2_E(t1,r1=r), Lambda
         else:
-            return lambda r1: p_2_E(t1=t,r1=r1)
+            return lambda r1: p_2_E(t1=t,r1=r1), Lambda
     else:
-        return p_2_E(t,r)
+        return p_2_E(t,r), Lambda
 
 def importData(simulation:str, probe:int=2, time:float = None)-> tuple:
     
@@ -88,7 +89,7 @@ def rmsTime(tp:tuple, robs:float, freq:float = 100,
         plt.show()
     
     #% RMS
-    pfunc   = pressure(r = robs)
+    pfunc,_ = pressure(r = robs)
     aux1    = (efectivePressure - pfunc(efectiveTime))**2
     num     = trapz(aux1, efectiveTime)
     den     = trapz(pfunc(efectiveTime)**2, efectiveTime)
@@ -99,7 +100,7 @@ def rmsTime(tp:tuple, robs:float, freq:float = 100,
 def rmsSpacial(rp:tuple, tobs:float = 0.5, plot:bool = True):
     
     r, p    = rp
-    pfunc   = pressure(t = tobs)
+    pfunc,_ = pressure(t = tobs)
     
     if plot:
         plt.plot(r, pfunc(r), 'k-', label = 'Analítico')
@@ -123,7 +124,7 @@ def plotTime(FWH:tuple, FWH2:tuple, SIM:tuple, robs:float = None, title:str = No
     t, p                = SIM
     
     if robs != None:
-        pfunc           = pressure(r = robs) 
+        pfunc,_         = pressure(r = robs) 
         plt.plot(t, pfunc(t), 'k', label = 'Analítico', alpha = 0.5)
         plt.plot(t, p,'r-.', label = 'Cálculo Direto')
     else:
@@ -145,8 +146,9 @@ def plotSpacial(FWH:tuple, SIM:np.ndarray, r:np.ndarray,
     p              = SIM
 
     if tobs != None:
-        pfunc           = pressure(t = tobs)
-        plt.plot(r, pfunc(r), 'k', label = 'Analítico', alpha =0.5)
+        pfunc,_         = pressure(t = tobs)
+        rfunc           = np.linspace(r[0],r[-1])
+        plt.plot(rfunc, pfunc(rfunc), 'k', label = 'Analítico', alpha =0.5)
         plt.plot(r, p,'ro-.', label = 'Cálculo Direto', alpha = 0.35)
     else:
         plt.plot(r, p,'r-.', label = 'FWH2')

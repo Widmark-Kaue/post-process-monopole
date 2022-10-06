@@ -3,12 +3,16 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 from scipy.integrate import trapz
-from scipy.special import hankel2
+from scipy.interpolate import interp1d
+from scipy.special import hankel2, hankel1
 
 
 def pressure(
-    r: float or np.ndarray = None, t: float or np.ndarray = None
-) -> float or np.ndarray:
+    r: float or np.ndarray = None, 
+    t: float or np.ndarray = None,
+) -> float or np.ndarray or any:
+
+    # constantes globais
     rf = 0.05715 / 2
     S = 0.1
     c0 = 340.29
@@ -21,7 +25,7 @@ def pressure(
     area = 2 * np.pi * rf
     velocity = S / area
     Lambda = c / freq
-
+    
     H_1_fonte_J = hankel2(1, (omega * rf / c0))
     A0 = velocity * 1j * rho0 * c0 / H_1_fonte_J
 
@@ -43,7 +47,6 @@ def pressure(
 
 def importData(simulation: str, probe: int = 2, time: float = None) -> tuple:
 
-    assert 0 <= probe <= 10, 'ERRO: O valor da probe deve estar entre 0 e 10'
     PATH_DATA = Path().absolute().parent / 'data'
     PROBES = PATH_DATA / 'probes' / simulation / 'p.txt'
     FWH = PATH_DATA / 'acousticData' / simulation / 'FWH-time.dat'
@@ -90,6 +93,13 @@ def rmsTime(
     t0 = list(t).index(efectiveTime[0])
     efectivePressure = p[t0:]
 
+    #% RMS
+    pfunc, _ = pressure(r=robs)
+    aux1 = (efectivePressure - pfunc(efectiveTime)) ** 2
+    num = trapz(aux1, efectiveTime)
+    den = trapz(pfunc(efectiveTime) ** 2, efectiveTime)
+    rms = num / den
+
     #% Plot
     if plot:
         plt.plot(efectiveTime, pfunc(efectiveTime), 'k-', label='Analítico')
@@ -100,12 +110,7 @@ def rmsTime(
         plt.grid()
         plt.show()
 
-    #% RMS
-    pfunc, _ = pressure(r=robs)
-    aux1 = (efectivePressure - pfunc(efectiveTime)) ** 2
-    num = trapz(aux1, efectiveTime)
-    den = trapz(pfunc(efectiveTime) ** 2, efectiveTime)
-    rms = num / den
+    
 
     return rms
 
@@ -131,6 +136,9 @@ def rmsSpacial(rp: tuple, tobs: float = 0.5, plot: bool = True) -> float:
 
     return rms
 
+
+def phaseAmplitude():
+    return 0
 
 def plotTime(
     FWH: tuple, 
@@ -166,27 +174,72 @@ def plotSpacial(
     FWH: tuple,
     SIM: np.ndarray,
     r: np.ndarray,
-    tobs: float = None,
+    tobs: float = 0.5,
+    npts:int = 800,
     title: str = None,
 ) -> None:
-    pfwh, pfwh2 = FWH
-    p = SIM
+    pfwh, pfwh2     = FWH
+    p               = SIM
+    pfunc, Lambda   = pressure(t=tobs)
+    rfunc           = np.linspace(0, r[-1], npts)
+    rvec            = np.linspace(r[0], r[-1], npts)
 
-    if tobs != None:
-        pfunc, _ = pressure(t=tobs)
-        rfunc = np.linspace(r[0], r[-1])
-        plt.plot(rfunc, pfunc(rfunc), 'k', label='Analítico', alpha=0.5)
-        plt.plot(r, p, 'ro-.', label='Cálculo Direto', alpha=0.35)
-    else:
-        plt.plot(r, p, 'r-.', label='FWH2')
-    plt.plot(r, pfwh, 'bo--', label='FWH', alpha=0.75)
-    plt.plot(r, pfwh2, 'go--', label='FWH', alpha=0.75)
+    pInt    = interp1d(r, p, kind = 'cubic')
+    pfwhInt = interp1d(r, pfwh, kind = 'cubic')
+    pfwh2Int= interp1d(r, pfwh2, kind = 'cubic')
+
+    plt.plot(rfunc/Lambda, pfunc(rfunc), 'k', label='Analítico', alpha=0.5)
+    plt.plot(rvec/Lambda, pInt(rvec), 'r--', label='Cálculo Direto', alpha=0.35)
+    plt.plot(rvec/Lambda, pfwhInt(rvec), 'b--', label='FWH', alpha=0.85)
+    plt.plot(rvec/Lambda, pfwh2Int(rvec), 'g--', label='FWH2', alpha=0.55)
+    # plt.plot(r/Lambda, p, 'ro')
+    # plt.plot(r/Lambda, pfwh,'bo')
+    # plt.plot(r/Lambda, pfwh2,'go')
 
     if title != None:
         plt.title(title)
-    plt.xlabel(r'r [m]')
+    plt.xlabel(r'r/$\lambda$ [m]')
     plt.ylabel('Pressão [Pa]')
-    plt.legend()
+    plt.ylim([-10,10])
 
+    plt.legend()
     plt.grid()
     plt.show()
+
+#%%
+# def pressureFlow(
+#     r: float or np.ndarray = None, 
+#     t: float or np.ndarray = None
+# )-> float or np.ndarray:
+    
+#     # constantes globais
+#     rf = 0.05715 / 2
+#     S = 0.1
+#     c0 = 340.29
+#     c = 331.45
+#     freq = 100
+#     omega = freq * 2 * np.pi
+#     T0 = 273.15
+#     T = (c0 / c) ** 2 * T0
+#     rho0 = 101325 / (287.058 * T)   #% Eq. dos Gases ideias
+#     area = 2 * np.pi * rf
+#     velocity = S / area
+#     Lambda = c / freq
+    
+#     M = 0.3
+#     y = 0
+#     x = np.arange(-100, 100, 0.13)
+#     k = omega/c0
+    
+#     ksi = omega*np.sqrt(x**2 + (1-M**2)*y**2)/((1-M**2)*c0)
+#     eta = lambda t1: -1j*M/(1-M**2)*k*x-1j*omega*t1
+#     H0flow = hankel1(0, ksi)
+#     H1flow = hankel1(1, ksi)
+    
+#     T1 = omega/(4*c0**3 *(1-M**2)**(3/2))
+#     T2 = M*H0flow - 1j*x*H1flow/np.sqrt(x**2+(1-M**2)*y**2)
+#     T3 = lambda t1: np.exp(eta(t1))
+#     Gx = lambda t1: T1*T2*T3(t1)
+#     GtFlow = 
+
+#     return 0

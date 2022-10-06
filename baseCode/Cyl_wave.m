@@ -3,57 +3,57 @@ close all
 clc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% TCC - SOLUÇÃO ANALÍTICA PARA MONOPOLO ESTACIONÁRIO:
+%% TCC - SOLUï¿½ï¿½O ANALï¿½TICA PARA MONOPOLO ESTACIONï¿½RIO:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% DADOS UTILIZADOS NA SIMULAÇÃO
+%% DADOS UTILIZADOS NA SIMULAï¿½ï¿½O
 
 %c_0=1;           % velocidade do som para fechar lambda=30
-freq=100;         % frequência da onda 
-P_sim=10;         % amplitude da pressão definida na simulação
+freq=100;         % frequï¿½ncia da onda 
+P_sim=10;         % amplitude da pressï¿½o definida na simulaï¿½ï¿½o
 t = 0.17;         % instante de tempo dos resultados
 
-% CÁLCULO DA TEMPERATURA DA SIMULAÇÃO
-c_0=340.29;       % velocidade do som utilizada no cálculo do comprimento de onda
-c = 331.45;       % velocidade do som a 0 ºC
-T0 = 273.15;      % 0 ºC em Kelvin
-T = (c_0/c)^2*T0; % temperatura da simulação 
-%omega=pi()/15;   % Dissertação
-%A=23.206;        % Constante para fonte pontual - definir a partir da aplicação de condição de contorno
+% Cï¿½LCULO DA TEMPERATURA DA SIMULAï¿½ï¿½O
+c_0=340.29;       % velocidade do som utilizada no cï¿½lculo do comprimento de onda
+c = 331.45;       % velocidade do som a 0 ï¿½C
+T0 = 273.15;      % 0 ï¿½C em Kelvin
+T = (c_0/c)^2*T0; % temperatura da simulaï¿½ï¿½o 
+%omega=pi()/15;   % Dissertaï¿½ï¿½o
+%A=23.206;        % Constante para fonte pontual - definir a partir da aplicaï¿½ï¿½o de condiï¿½ï¿½o de contorno
 %A=1;
 
-% CÁLCULO DA DENSIDADE
-rho0 = 101325/(287.058*T); % equação dos gases ideais
+% Cï¿½LCULO DA DENSIDADE
+rho0 = 101325/(287.058*T); % equaï¿½ï¿½o dos gases ideais
 
-% CÁLCULO DO TEMPO DE SIMULAÇÃO 
+% Cï¿½LCULO DO TEMPO DE SIMULAï¿½ï¿½O 
 r_buffer = 204;                 % raio externo da zona de buffer
 t_simulacao = (r_buffer+6)/c_0; % +6 para passar o primeiro pulso e fechar 210
 
-%% SOLUÇÃO ANALÍTICA
+%% SOLUï¿½ï¿½O ANALï¿½TICA
 %freq=omega/(2*pi());
 omega=freq*2*pi;
 lambda=c_0/freq;
 r=.0001:0.1:100;
 
-%solução analitica da dissertação
+%soluï¿½ï¿½o analitica da dissertaï¿½ï¿½o
 epsilon=1;
 alpha=log(2)/(9);
 f=epsilon*exp(-alpha*r.^2);
 
 
-H_0=besselh(0, (omega*r/c_0));      %Função de Hankel
+H_0=besselh(0, (omega*r/c_0));      %Funï¿½ï¿½o de Hankel
 G_t=(-1i*omega)*(1i/(4*c_0^2))*H_0; %transformada de fourier da derivada dG/dt
 
-%convolução via FFT espacial
+%convoluï¿½ï¿½o via FFT espacial
 %f_k=fft(f);
 %G_k=fft(G_t);
 %P=ifft(f_k.*G_k);
 
-P=conv(f,G_t); %convolução
+P=conv(f,G_t); %convoluï¿½ï¿½o
 
-%% CÁLCULO DA CONSTANTE "A" PELA CONDIÇÃO DE CONTORNO
+%% Cï¿½LCULO DA CONSTANTE "A" PELA CONDIï¿½ï¿½O DE CONTORNO
 
 r_fonte = 0.05715/2;
-H_0_fonte=besselh(0, (omega*r_fonte/c_0));      %Função de Hankel
+H_0_fonte=besselh(0, (omega*r_fonte/c_0));      %Funï¿½ï¿½o de Hankel
 G_t_fonte=(-1i*omega)*(1i/(4*c_0^2))*H_0_fonte; %transformada de fourier da derivada dG/dt
 
 A = abs(P_sim/G_t_fonte);
@@ -61,23 +61,23 @@ P_2=A*G_t;                                     %Amplitude considerando fonte pon
 
 p_2=-1*imag(P_2*exp(-1i*omega*t));              %calculado com fonte pontual
 
-%% SOLUÇÃO ANALÍTICA - BUCKINGHAM
+%% SOLUï¿½ï¿½O ANALï¿½TICA - BUCKINGHAM
 
-H_0_B=besselh(0, 2, (omega*r/c_0));                  %Função de Hankel
-% UTILIZANDO PARÂMETRO DE PRESSÃO (COMENTAR A SOLUÇÃO DA VELOCIDADE PARA
+H_0_B=besselh(0, 2, (omega*r/c_0));                  %Funï¿½ï¿½o de Hankel
+% UTILIZANDO PARï¿½METRO DE PRESSï¿½O (COMENTAR A SOLUï¿½ï¿½O DA VELOCIDADE PARA
 % CALCULAR)
 
-H_0_fonte_B=besselh(0, 2, (omega*r_fonte/c_0));      %Função de Hankel
+H_0_fonte_B=besselh(0, 2, (omega*r_fonte/c_0));      %Funï¿½ï¿½o de Hankel
 A_B = abs(P_sim/H_0_fonte_B);
 P_2_B=A_B*H_0_B;
 p_2_B = imag(P_2_B*exp(1i*omega*t)); %calculado com fonte pontual
 
-% UTILIZANDO PARÂMETRO DE VELOCIDADE
-S = 0.1;                              % Vazão volumétrica definida na simulação por unidade de espessura do domínio
+% UTILIZANDO PARï¿½METRO DE VELOCIDADE
+S = 0.1;                              % Vazï¿½o volumï¿½trica definida na simulaï¿½ï¿½o por unidade de espessura do domï¿½nio
 P_2_B = -rho0*omega*S*H_0_B/4;
-p_2_B = imag(P_2_B*exp(1i*omega*t)); %calculado com fonte pontual / solução invertida
+p_2_B = imag(P_2_B*exp(1i*omega*t)); %calculado com fonte pontual / soluï¿½ï¿½o invertida
 
-%% SOLUÇÃO ANALÍTICA - JACOBSEN
+%% SOLUï¿½ï¿½O ANALï¿½TICA - JACOBSEN
 
 Area = 2*pi*r_fonte;
 Velocity = S/Area;
@@ -85,25 +85,25 @@ H_1_fonte_J=besselh(1, 2, (omega*r_fonte/c_0));
 
 A0 = Velocity*1i*rho0*c_0/H_1_fonte_J;
 
-H_0_J=besselh(0, 2, (omega*r/c_0));                  %Função de Hankel
+H_0_J=besselh(0, 2, (omega*r/c_0));                  %Funï¿½ï¿½o de Hankel
 P_2_J = A0*H_0_J;
 p_2_J = imag(P_2_J*exp(1i*omega*t)); %calculado com fonte pontual
 
-%% RESULTADOS MONOPOLO ESTACIONÁRIO
-%p_=-1*imag(P*exp(-1i*omega*t));         % Aqui utilizei -Im pois a excitação é um seno na dissertação
+%% RESULTADOS MONOPOLO ESTACIONï¿½RIO
+%p_=-1*imag(P*exp(-1i*omega*t));         % Aqui utilizei -Im pois a excitaï¿½ï¿½o ï¿½ um seno na dissertaï¿½ï¿½o
 
-% Thesis=load('akhnoukh.txt');           % analítico da dissertação extraído do gráfico
-Simulation = load('datau01_ppw32_t017.txt');        % resultado da simulação
+% Thesis=load('akhnoukh.txt');           % analï¿½tico da dissertaï¿½ï¿½o extraï¿½do do grï¿½fico
+Simulation = load('datau01_ppw32_t017.txt');        % resultado da simulaï¿½ï¿½o
 
 % figure(1)
-% %plot(r,p_(1:length(r)))                                % Plot do analítico com fonte da dissertação
-% % plot(Thesis(:,1), Thesis(:,2), 'r-')                  % Analítico extraído do gráfico
+% %plot(r,p_(1:length(r)))                                % Plot do analï¿½tico com fonte da dissertaï¿½ï¿½o
+% % plot(Thesis(:,1), Thesis(:,2), 'r-')                  % Analï¿½tico extraï¿½do do grï¿½fico
 % hold on
-% %plot(r,p_2(1:length(r)), 'k-')                          % Analítico Akhnoukh com fonte pontual
-% %plot(r,p_2_B(1:length(r)), 'k-')                        % Analítico Buckingham com fonte pontual
-% plot(r,p_2_J(1:length(r)), 'k-')                        % Analítico Jacobsen com fonte pontual
-% plot(Simulation(:,8), (Simulation(:,5))-101325, 'r-')   % Simulação
-% %plot(Simulation(:,13), (Simulation(:,8))-101325, 'r-') % Simulação com
+% %plot(r,p_2(1:length(r)), 'k-')                          % Analï¿½tico Akhnoukh com fonte pontual
+% %plot(r,p_2_B(1:length(r)), 'k-')                        % Analï¿½tico Buckingham com fonte pontual
+% plot(r,p_2_J(1:length(r)), 'k-')                        % Analï¿½tico Jacobsen com fonte pontual
+% plot(Simulation(:,8), (Simulation(:,5))-101325, 'r-')   % Simulaï¿½ï¿½o
+% %plot(Simulation(:,13), (Simulation(:,8))-101325, 'r-') % Simulaï¿½ï¿½o com
 % %meta data
 % hold off
 % xlabel('r (m)')
@@ -113,11 +113,11 @@ Simulation = load('datau01_ppw32_t017.txt');        % resultado da simulação
 %% MONOPOLO COM ESCOAMENTO
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% SOLUÇÃO ANALÍTICA
+%% SOLUï¿½ï¿½O ANALï¿½TICA
 M = 0.3;
 y = 0;
 x = -100:0.13:100;
-k = omega/c_0; % número de onda
+k = omega/c_0; % nï¿½mero de onda
 Gx = zeros(1,length(x)); 
 Gt_escoamento = zeros(1,length(x));
 
@@ -126,12 +126,12 @@ eta = -1i*M/(1-M^2)*k*x-1i*omega*t;
 H_0_escoamento = besselh(0, ksi);
 H_1_escoamento = besselh(1, ksi);
 
-% DERIVADA DA FUNÇÃO GREEN EM X
+% DERIVADA DA FUNï¿½ï¿½O GREEN EM X
 for i=1:length(x)
 Gx(i) = omega/(4*c_0^3*(1-M^2)^(3/2))*(M*H_0_escoamento(i)-1i*x(i)*H_1_escoamento(i)/sqrt(x(i)^2+(1-M^2)*y^2))*exp(eta(i));
 end
 
-% DERIVADA DA FUNÇÃO GREEN EM t
+% DERIVADA DA FUNï¿½ï¿½O GREEN EM t
 for i=1:length(x)
 Gt_escoamento(i) = eta(i)*1i/(4*c_0^2*sqrt(1-M^2))*H_0_escoamento(i)*exp(eta(i))*(-1i*omega);
 end
@@ -142,10 +142,10 @@ p_flow=-imag(rho0*(c_0^2)*S*(Gt_escoamento+M*Gx));
 
  figure(2)
  hold on
-%plot(r,p_2(1:length(r)), 'r-')                          % Analítico Akhnoukh com fonte pontual
-plot(r,p_2_J(1:length(r)), 'k-')                        % Analítico Jacobsen com fonte pontual
-  plot(x,p_flow, 'g-')                                  % Analítico Akhnoukh com escoamento
-% plot(Simulation(:,8), (Simulation(:,5))-101325, 'r-')   % Simulação
+%plot(r,p_2(1:length(r)), 'r-')                          % Analï¿½tico Akhnoukh com fonte pontual
+plot(r,p_2_J(1:length(r)), 'k-')                        % Analï¿½tico Jacobsen com fonte pontual
+  plot(x,p_flow, 'g-')                                  % Analï¿½tico Akhnoukh com escoamento
+% plot(Simulation(:,8), (Simulation(:,5))-101325, 'r-')   % Simulaï¿½ï¿½o
 hold off
  xlabel('x (m)')
 ylabel('p (Pa)')

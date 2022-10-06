@@ -6,7 +6,7 @@ microphone = np.linspace(2, 102, 20)
 
 #%% Comportamento temporal
 for m in range(len(microphone)):
-    SIM, FWH, FWH2 = wv.importData('back40', probe=m)
+    SIM, FWH, FWH2 = wv.importData('32ppw', probe=m)
 
     #% Plot
     ti = f'Comportamento temporal (r = {round(microphone[m],2)} [m])'

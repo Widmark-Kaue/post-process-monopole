@@ -2,7 +2,7 @@
 import numpy as np
 import wave as wv
 #%% Parâmetros de simulação
-microphone = np.linspace(2, 102, 20)
+microphone = np.linspace(2, 102, 11)
 
 #%% Comportamento temporal
 for m in range(len(microphone)):
@@ -13,7 +13,7 @@ for m in range(len(microphone)):
     wv.plotTime(FWH, FWH2, SIM, robs=microphone[m], title=ti)
 
 #%% Comportamento espacial
-p, pfwh, pfwh2 = wv.importData('back40', time=0.5)
+p, pfwh, pfwh2 = wv.importData('32ppw', time=0.5)
 ti = f'Comportamento espacial (t = 0.5 s)'
 wv.plotSpacial((pfwh, pfwh2), p, r=microphone, tobs=0.5, title=ti)
 

@@ -1,7 +1,7 @@
 #%% Librarys
 import numpy as np
-from pathlib import Path
 import matplotlib.pyplot as plt
+from pathlib import Path
 from scipy.integrate import trapz
 from scipy.interpolate import interp1d
 from scipy.special import hankel2, hankel1
@@ -45,12 +45,12 @@ def pressure(
         return p_2_E(t, r), Lambda
 
 
-def importData(simulation: str, probe: int = 2, time: float = None) -> tuple:
+def importData(simulation: str, probe: int = 2, time: float = None, case:str = 'monopole') -> tuple:
 
-    PATH_DATA = Path().absolute().parent / 'data'
+    PATH_DATA = Path().absolute().parent / 'data' / case
     PROBES = PATH_DATA / 'probes' / simulation / 'p.txt'
     FWH = PATH_DATA / 'acousticData' / simulation / 'FWH-time.dat'
-    FWH2 = PATH_DATA / 'acousticData' / simulation / 'FWH-time.dat'
+    FWH2 = PATH_DATA / 'acousticData' / simulation / 'FWH2-time.dat'
 
     toPa = 101325
 
@@ -154,7 +154,7 @@ def plotTime(
     if robs != None:
         pfunc, _ = pressure(r=robs)
         plt.plot(t, pfunc(t), 'k', label='Analítico', alpha=0.5)
-        # plt.plot(t, p, 'r-.', label='Cálculo Direto')
+        plt.plot(t, p, 'r-.', label='Cálculo Direto')
     
     plt.plot(fwh_t, fwh_p, 'r--', label='FWH', alpha=1)
     plt.plot(fwh2_t, fwh2_p, 'g--', label='FWH2', alpha=0.75)

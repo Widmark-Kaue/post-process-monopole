@@ -11,7 +11,7 @@ if not PATH_WRITE.exists():
 
 def probes(number_of_probes: int = 30, lim: tuple = (2, 102)):
     p = np.linspace(lim[0], lim[1], number_of_probes)
-    with open(PATH_WRITE / 'probes.txt', 'w') as file:
+    with open(PATH_WRITE / 'probesTime.txt', 'w') as file:
         file.write('probeLocations\n\t(\n')
         for i in p:
             file.write(f'\t\t({round(i,3)} 0 0)\n')
@@ -23,7 +23,7 @@ def microphones(
 ):
     m = np.linspace(lim[0], lim[1], number_of_observer)
     letter = list(ascii_letters)
-    with open(PATH_WRITE / 'microphones.txt', 'w') as file:
+    with open(PATH_WRITE / 'microphonesTimeS.txt', 'w') as file:
         file.write('observers\n{\n')
         for k, i in enumerate(m):
             file.write(f'\tR-{letter[k]}\n' + '\t{\n')
@@ -34,6 +34,6 @@ def microphones(
 
 
 #%% Run
-probes(number_of_probes=21)
-microphones(number_of_observer=21)
+probes(number_of_probes=51)
+microphones(number_of_observer=51)
 # %%

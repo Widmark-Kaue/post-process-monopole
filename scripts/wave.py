@@ -191,9 +191,9 @@ def plotSpacial(
     plt.plot(rvec/Lambda, pInt(rvec), 'r--', label='Cálculo Direto', alpha=0.35)
     plt.plot(rvec/Lambda, pfwhInt(rvec), 'b--', label='FWH', alpha=0.85)
     plt.plot(rvec/Lambda, pfwh2Int(rvec), 'g--', label='FWH2', alpha=0.55)
-    # plt.plot(r/Lambda, p, 'ro')
-    # plt.plot(r/Lambda, pfwh,'bo')
-    # plt.plot(r/Lambda, pfwh2,'go')
+    plt.plot(r/Lambda, p, 'ro')
+    plt.plot(r/Lambda, pfwh,'bo')
+    plt.plot(r/Lambda, pfwh2,'go')
 
     if title != None:
         plt.title(title)

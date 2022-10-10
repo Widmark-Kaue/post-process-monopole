@@ -45,16 +45,16 @@ def pressure(
         return p_2_E(t, r), Lambda
 
 
-def importData(simulation: str, probe: int = 2, time: float = None, case:str = 'monopole') -> tuple:
+def importData(simulation: str, probe: int = 2, time: float = 0, case:str = 'monopole') -> tuple:
 
     PATH_DATA = Path().absolute().parent / 'data' / case
-    PROBES = PATH_DATA / 'probes' / simulation / 'p.txt'
+    PROBES = PATH_DATA / 'probes' / simulation / str(time) / 'p.txt'
     FWH = PATH_DATA / 'acousticData' / simulation / 'FWH-time.dat'
     FWH2 = PATH_DATA / 'acousticData' / simulation / 'FWH2-time.dat'
 
     toPa = 101325
 
-    if time == None:
+    if time == 0:
         t, p = np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
         fwh_t, fwh_p = np.loadtxt(
             FWH, usecols=(0, probe + 1), skiprows=1, unpack=True

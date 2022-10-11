@@ -1,6 +1,7 @@
 #%% Librarys
 import numpy as np
 import matplotlib.pyplot as plt
+from re import search
 from pathlib import Path
 from scipy.integrate import trapz
 from scipy.interpolate import interp1d
@@ -65,6 +66,8 @@ def importData(simulation: str, probe: int = 2, time: float = 0, case:str = 'mon
         print(f'Probe: {probe}')
         return ((t, p - toPa), (fwh_t, fwh_p), (fwh2_t, fwh2_p))
     else:
+        arq = open(PROBES)
+        
         tp = np.loadtxt(PROBES, usecols=0)
         pos = np.searchsorted(tp, time) - 1
         p = np.loadtxt(PROBES, skiprows=12 + pos)[1, 1:]

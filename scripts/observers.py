@@ -1,5 +1,6 @@
 #%% Librarys
 import numpy as np
+from re import sub
 from pathlib import Path
 from string import ascii_letters
 
@@ -9,13 +10,24 @@ if not PATH_WRITE.exists():
     PATH_WRITE.mkdir()
 
 
-def probes(number_of_probes: int = 30, lim: tuple = (2, 102)):
+def probes(number_of_probes: int = 30, lim: tuple = (2, 102), 
+         name_of_archive:str = 'probesTime', field:str = 'p'):
     p = np.linspace(lim[0], lim[1], number_of_probes)
-    with open(PATH_WRITE / 'probesTime.txt', 'w') as file:
-        file.write('probeLocations\n\t(\n')
-        for i in p:
-            file.write(f'\t\t({round(i,3)} 0 0)\n')
-        file.write('\t);')
+    
+    arq = open(PATH_WRITE / 'templateProbe.txt', 'r').read()
+
+    arq = sub('&',name_of_archive, arq)
+    arq = sub('@', field, arq)
+
+    write = 'probeLocations\n\t\t(\n'
+    for i in p:
+        write += f'\t\t\t({round(i,3)} 0 0)\n'
+    write += '\t\t);'
+
+    arq = sub('#', write, arq)
+    
+    with open(PATH_WRITE / name_of_archive, 'w') as file:
+        file.write(arq)
 
 
 def microphones(
@@ -34,6 +46,6 @@ def microphones(
 
 
 #%% Run
-probes(number_of_probes=51)
+probes(number_of_probes=10_000)
 microphones(number_of_observer=51)
 # %%

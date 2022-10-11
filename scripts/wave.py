@@ -1,7 +1,8 @@
 #%% Librarys
 import numpy as np
 import matplotlib.pyplot as plt
-from re import search
+
+from re import findall
 from pathlib import Path
 from scipy.integrate import trapz
 from scipy.interpolate import interp1d
@@ -9,7 +10,7 @@ from scipy.special import hankel2, hankel1
 
 
 def pressure(
-    r: float or np.ndarray = None, 
+    r: float or np.ndarray = None,
     t: float or np.ndarray = None,
 ) -> float or np.ndarray or any:
 
@@ -26,7 +27,7 @@ def pressure(
     area = 2 * np.pi * rf
     velocity = S / area
     Lambda = c / freq
-    
+
     H_1_fonte_J = hankel2(1, (omega * rf / c0))
     A0 = velocity * 1j * rho0 * c0 / H_1_fonte_J
 
@@ -46,7 +47,9 @@ def pressure(
         return p_2_E(t, r), Lambda
 
 
-def importData(simulation: str, probe: int = 2, time: float = 0, case:str = 'monopole') -> tuple:
+def importData(
+    simulation: str, probe: int = 2, time: float = 0, case: str = 'monopole'
+) -> tuple:
 
     PATH_DATA = Path().absolute().parent / 'data' / case
     PROBES = PATH_DATA / 'probes' / simulation / str(time) / 'p.txt'
@@ -57,27 +60,29 @@ def importData(simulation: str, probe: int = 2, time: float = 0, case:str = 'mon
 
     if time == 0:
         t, p = np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
-        fwh_t, fwh_p = np.loadtxt(
-            FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
-        )
-        fwh2_t, fwh2_p = np.loadtxt(
-            FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
-        )
+        fwh_t, fwh_p = np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True)
+        fwh2_t, fwh2_p = np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True)
         print(f'Probe: {probe}')
         return ((t, p - toPa), (fwh_t, fwh_p), (fwh2_t, fwh2_p))
     else:
-        arq = open(PROBES)
+        if not PROBES.exists():
+            PROBES = PROBES.parent.parent / '0' / 'p.txt'
+
+        tsim = np.loadtxt(PROBES, usecols=0, ndmin=1)
+        tfwh = np.loadtxt(FWH, usecols=0, skiprows=1, ndmin=1)
+
+        arq = open(PROBES, 'r')
+        skip = len(findall('#', arq.read())) - 1
+        arq.close()
+
+        pos1 = np.searchsorted(tsim, time)
+        p = np.loadtxt(PROBES, skiprows=skip + pos1 - 1*(pos1!=0), max_rows=1)[1:]
         
-        tp = np.loadtxt(PROBES, usecols=0)
-        pos = np.searchsorted(tp, time) - 1
-        p = np.loadtxt(PROBES, skiprows=12 + pos)[1, 1:]
+        pos2 = np.searchsorted(tfwh, time)
+        pfwh = np.loadtxt(FWH, skiprows=1 + pos2 -1*(pos2!=0), max_rows=1)[1:]
+        pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos2 -1*(pos2!=0), max_rows=1)[1:]
 
-        tfwh = np.loadtxt(FWH, usecols=0, skiprows=1)
-        pos = np.searchsorted(tfwh, time) - 1
-        pfwh = np.loadtxt(FWH, skiprows=1 + pos)[1:]
-        pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos)[1:]
-
-        print(f'Time = {tp[pos]} \nPos = {pos}')
+        print(f'Time = {tsim[pos1]} \nPos = {pos1}')
         return (p - toPa, pfwh, pfwh)
 
 
@@ -113,8 +118,6 @@ def rmsTime(
         plt.grid()
         plt.show()
 
-    
-
     return rms
 
 
@@ -143,12 +146,9 @@ def rmsSpacial(rp: tuple, tobs: float = 0.5, plot: bool = True) -> float:
 def phaseAmplitude():
     return 0
 
+
 def plotTime(
-    FWH: tuple, 
-    FWH2: tuple, 
-    SIM: tuple, 
-    robs: float = None, 
-    title: str = None
+    FWH: tuple, FWH2: tuple, SIM: tuple, robs: float = None, title: str = None
 ) -> None:
     fwh_t, fwh_p = FWH
     fwh2_t, fwh2_p = FWH2
@@ -158,7 +158,7 @@ def plotTime(
         pfunc, _ = pressure(r=robs)
         plt.plot(t, pfunc(t), 'k', label='Analítico', alpha=0.5)
         plt.plot(t, p, 'r-.', label='Cálculo Direto')
-    
+
     plt.plot(fwh_t, fwh_p, 'r--', label='FWH', alpha=1)
     plt.plot(fwh2_t, fwh2_p, 'g--', label='FWH2', alpha=0.75)
 
@@ -173,47 +173,50 @@ def plotTime(
 
 
 def plotSpacial(
-    FWH: tuple,
-    SIM: np.ndarray,
-    r: np.ndarray,
-    tobs: float = 0.5,
-    npts:int = 800,
-    title: str = None,
+    FWH:        tuple,
+    SIM:        np.ndarray,
+    r:          tuple   = (2,102),
+    tobs:       float   = 0.5,
+    npts:       int     = 800,
+    title:      str     = None
 ) -> None:
-    pfwh, pfwh2     = FWH
-    p               = SIM
-    pfunc, Lambda   = pressure(t=tobs)
-    rfunc           = np.linspace(0, r[-1], npts)
-    rvec            = np.linspace(r[0], r[-1], npts)
+    pfwh, pfwh2 = FWH
+    p = SIM
+    pfunc, Lambda = pressure(t=tobs)
+    rfunc = np.linspace(0, r[-1], npts)
+    rvec1 = np.linspace(r[0], r[-1], len(p))
+    rvec2 = np.linspace(r[0], r[-1], len(pfwh))
+    
+    plt.plot(rfunc / Lambda, pfunc(rfunc), 'k', label='Analítico', alpha=0.5)
+    plt.plot(rvec1 / Lambda, p, 'r--', label="Direto", alpha = 0.85)
+    plt.plot(rvec2 / Lambda, pfwh, 'b--', label="FWH", alpha = 0.25)
+    plt.plot(rvec2 / Lambda, pfwh2, 'g--', label="FWH2", alpha = 0.15)
 
-    pInt    = interp1d(r, p, kind = 'cubic')
-    pfwhInt = interp1d(r, pfwh, kind = 'cubic')
-    pfwh2Int= interp1d(r, pfwh2, kind = 'cubic')
+    # pInt = interp1d(rvec1, p, kind='cubic')
+    # pfwhInt = interp1d(rvec2, pfwh, kind='cubic')
+    # pfwh2Int = interp1d(rvec2, pfwh2, kind='cubic')
 
-    plt.plot(rfunc/Lambda, pfunc(rfunc), 'k', label='Analítico', alpha=0.5)
-    plt.plot(rvec/Lambda, pInt(rvec), 'r--', label='Cálculo Direto', alpha=0.35)
-    plt.plot(rvec/Lambda, pfwhInt(rvec), 'b--', label='FWH', alpha=0.85)
-    plt.plot(rvec/Lambda, pfwh2Int(rvec), 'g--', label='FWH2', alpha=0.55)
-    plt.plot(r/Lambda, p, 'ro')
-    plt.plot(r/Lambda, pfwh,'bo')
-    plt.plot(r/Lambda, pfwh2,'go')
+    # plt.plot(rvec / Lambda, pInt(rvec), 'r--', label='Cálculo Direto', alpha=0.35)
+    # plt.plot(rvec / Lambda, pfwhInt(rvec), 'b--', label='FWH', alpha=0.85)
+    # plt.plot(rvec / Lambda, pfwh2Int(rvec), 'g--', label='FWH2', alpha=0.55)
 
     if title != None:
         plt.title(title)
     plt.xlabel(r'r/$\lambda$ [m]')
     plt.ylabel('Pressão [Pa]')
-    plt.ylim([-10,10])
+    plt.ylim([-10, 10])
 
     plt.legend()
     plt.grid()
     plt.show()
 
+
 #%%
 # def pressureFlow(
-#     r: float or np.ndarray = None, 
+#     r: float or np.ndarray = None,
 #     t: float or np.ndarray = None
 # )-> float or np.ndarray:
-    
+
 #     # constantes globais
 #     rf = 0.05715 / 2
 #     S = 0.1
@@ -227,21 +230,21 @@ def plotSpacial(
 #     area = 2 * np.pi * rf
 #     velocity = S / area
 #     Lambda = c / freq
-    
+
 #     M = 0.3
 #     y = 0
 #     x = np.arange(-100, 100, 0.13)
 #     k = omega/c0
-    
+
 #     ksi = omega*np.sqrt(x**2 + (1-M**2)*y**2)/((1-M**2)*c0)
 #     eta = lambda t1: -1j*M/(1-M**2)*k*x-1j*omega*t1
 #     H0flow = hankel1(0, ksi)
 #     H1flow = hankel1(1, ksi)
-    
+
 #     T1 = omega/(4*c0**3 *(1-M**2)**(3/2))
 #     T2 = M*H0flow - 1j*x*H1flow/np.sqrt(x**2+(1-M**2)*y**2)
 #     T3 = lambda t1: np.exp(eta(t1))
 #     Gx = lambda t1: T1*T2*T3(t1)
-#     GtFlow = 
+#     GtFlow =
 
 #     return 0

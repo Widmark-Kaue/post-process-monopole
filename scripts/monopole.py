@@ -1,6 +1,7 @@
 #%% Librarys
 import numpy as np
 import wave as wv
+
 #%% Parâmetros de simulação
 microphone = np.linspace(2, 102, 11)
 
@@ -15,7 +16,7 @@ for m in range(len(microphone)):
 #%% Comportamento espacial
 p, pfwh, pfwh2 = wv.importData('32ppw', time=0.5)
 ti = f'Comportamento espacial (t = 0.5 s)'
-wv.plotSpacial((pfwh, pfwh2), p, r=microphone, tobs=0.5, title=ti)
+wv.plotSpacial((pfwh, pfwh2), p, r=(2,102), tobs=0.5, title=ti)
 
 #%% RMS
 RMS = wv.rmsTime(SIM, robs=microphone[0]) * 100
@@ -23,7 +24,6 @@ print(RMS)
 
 
 # %% teste
-
 
 
 # %%

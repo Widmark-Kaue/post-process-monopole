@@ -192,13 +192,6 @@ def plotSpacial(
     plt.plot(rvec2 / Lambda, pfwh, 'b--', label="FWH", alpha = 0.25)
     plt.plot(rvec2 / Lambda, pfwh2, 'g--', label="FWH2", alpha = 0.15)
 
-    # pInt = interp1d(rvec1, p, kind='cubic')
-    # pfwhInt = interp1d(rvec2, pfwh, kind='cubic')
-    # pfwh2Int = interp1d(rvec2, pfwh2, kind='cubic')
-
-    # plt.plot(rvec / Lambda, pInt(rvec), 'r--', label='Cálculo Direto', alpha=0.35)
-    # plt.plot(rvec / Lambda, pfwhInt(rvec), 'b--', label='FWH', alpha=0.85)
-    # plt.plot(rvec / Lambda, pfwh2Int(rvec), 'g--', label='FWH2', alpha=0.55)
 
     if title != None:
         plt.title(title)

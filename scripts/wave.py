@@ -55,8 +55,7 @@ def pressureFlow(
 ):
 
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
-    if len(np.array(x)) != len(np.array(y)):
-        assert len(np.array(y)) > 1, 'Dimensão de x e y devem ser iguais'
+    if type(y) != np.ndarray:
         y = y * np.ones(len(x))
 
     # Constantes Globais
@@ -76,6 +75,7 @@ def pressureFlow(
         * np.sqrt(x**2 + (1 - M**2) * y**2)
         / ((1 - M**2) * c0**2)
     )
+
     eta = -1j * M * k * x / (1 - M**2) - 1j * omega * t
     H0Flow = hankel1(0, csi)
     H1Flow = hankel1(1, csi)
@@ -94,7 +94,10 @@ def pressureFlow(
 
 
 def importData(
-    simulation: str, probe: int = 2, time: float = 0, case: str = 'monopole'
+    simulation: str,
+    probe: int = 2, 
+    time: float = 0, 
+    case: str = 'monopole'
 ) -> tuple:
 
     PATH_DATA = Path().absolute().parent / 'data' / case

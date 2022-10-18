@@ -46,15 +46,18 @@ def pressure(
     else:
         return p_2_E(t, r), Lambda
 
-def pressureFlow(x:float or np.ndarray,
-                t:float or np.ndarray,
-                y:float or np.ndarray = 0, M:float=0.3):
 
-    assert 0<=M<=1, "Número de Mach deve está entre 0 e 1"
+def pressureFlow(
+    x: float or np.ndarray,
+    t: float or np.ndarray,
+    y: float or np.ndarray = 0,
+    M: float = 0.3,
+):
+
+    assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
     if len(np.array(x)) != len(np.array(y)):
-        assert len(np.array(y)) > 1, "Dimensão de x e y devem ser iguais"
-        y = y*np.ones(len(x))
-
+        assert len(np.array(y)) > 1, 'Dimensão de x e y devem ser iguais'
+        y = y * np.ones(len(x))
 
     # Constantes Globais
     c0 = 340.29
@@ -64,24 +67,31 @@ def pressureFlow(x:float or np.ndarray,
     rho0 = 101325 / (287.058 * T)   #% Eq. dos Gases ideias
     S = 0.1
     freq = 100
-    omega = freq*2*np.pi
-    k = omega/c0
+    omega = freq * 2 * np.pi
+    k = omega / c0
 
     # Termos da solução (eqs. 4.11 4.13 )
-    csi = omega*np.sqrt(x**2+(1-M**2)*y**2)/((1-M**2)*c0**2)
-    eta = -1j*M*k*x/(1-M**2) - 1j*omega*t
+    csi = (
+        omega
+        * np.sqrt(x**2 + (1 - M**2) * y**2)
+        / ((1 - M**2) * c0**2)
+    )
+    eta = -1j * M * k * x / (1 - M**2) - 1j * omega * t
     H0Flow = hankel1(0, csi)
     H1Flow = hankel1(1, csi)
 
-    T1 = omega/(4*c0**3*(1-M**2)**(3/2))
-    T2 = M*H0Flow -1j*x*H1Flow/np.sqrt(x**2 + (1-M**2)*y**2) 
+    T1 = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
+    T2 = M * H0Flow - 1j * x * H1Flow / np.sqrt(x**2 + (1 - M**2) * y**2)
     T3 = np.exp(eta)
-    Gx = T1*T2*T3 # derivada em x da função de Green
-    Gt = 1j*(-1j*omega)/(4*c0**2*np.sqrt(1-M**2))*H0Flow*T3 # derivada em t da função de Green
-    f  = rho0*(c0**2)*S 
-    pFlow = (f*(Gt+M*Gx)).imag
+    Gx = T1 * T2 * T3   # derivada em x da função de Green
+    Gt = (
+        1j * (-1j * omega) / (4 * c0**2 * np.sqrt(1 - M**2)) * H0Flow * T3
+    )   # derivada em t da função de Green
+    f = rho0 * (c0**2) * S
+    pFlow = (f * (Gt + M * Gx)).imag
 
     return pFlow
+
 
 def importData(
     simulation: str, probe: int = 2, time: float = 0, case: str = 'monopole'
@@ -96,8 +106,12 @@ def importData(
 
     if time == 0:
         t, p = np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
-        fwh_t, fwh_p = np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True)
-        fwh2_t, fwh2_p = np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True)
+        fwh_t, fwh_p = np.loadtxt(
+            FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
+        )
+        fwh2_t, fwh2_p = np.loadtxt(
+            FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
+        )
         print(f'Probe: {probe}')
         return ((t, p - toPa), (fwh_t, fwh_p), (fwh2_t, fwh2_p))
     else:
@@ -112,11 +126,17 @@ def importData(
         arq.close()
 
         pos1 = np.searchsorted(tsim, time)
-        p = np.loadtxt(PROBES, skiprows=skip + pos1 - 1*(pos1!=0), max_rows=1)[1:]
-        
+        p = np.loadtxt(
+            PROBES, skiprows=skip + pos1 - 1 * (pos1 != 0), max_rows=1
+        )[1:]
+
         pos2 = np.searchsorted(tfwh, time)
-        pfwh = np.loadtxt(FWH, skiprows=1 + pos2 -1*(pos2!=0), max_rows=1)[1:]
-        pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos2 -1*(pos2!=0), max_rows=1)[1:]
+        pfwh = np.loadtxt(
+            FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+        )[1:]
+        pfwh2 = np.loadtxt(
+            FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+        )[1:]
 
         print(f'Time = {tsim[pos1]} \nPos = {pos1}')
         return (p - toPa, pfwh, pfwh)
@@ -209,12 +229,12 @@ def plotTime(
 
 
 def plotSpacial(
-    FWH:        tuple,
-    SIM:        np.ndarray,
-    r:          tuple   = (2,102),
-    tobs:       float   = 0.5,
-    npts:       int     = 800,
-    title:      str     = None
+    FWH: tuple,
+    SIM: np.ndarray,
+    r: tuple = (2, 102),
+    tobs: float = 0.5,
+    npts: int = 800,
+    title: str = None,
 ) -> None:
     pfwh, pfwh2 = FWH
     p = SIM
@@ -222,12 +242,11 @@ def plotSpacial(
     rfunc = np.linspace(0, r[-1], npts)
     rvec1 = np.linspace(r[0], r[-1], len(p))
     rvec2 = np.linspace(r[0], r[-1], len(pfwh))
-    
-    plt.plot(rfunc / Lambda, pfunc(rfunc), 'k', label='Analítico', alpha=0.5)
-    plt.plot(rvec1 / Lambda, p, 'r--', label="Direto", alpha = 0.85)
-    plt.plot(rvec2 / Lambda, pfwh, 'b--', label="FWH", alpha = 0.25)
-    plt.plot(rvec2 / Lambda, pfwh2, 'g--', label="FWH2", alpha = 0.15)
 
+    plt.plot(rfunc / Lambda, pfunc(rfunc), 'k', label='Analítico', alpha=0.5)
+    plt.plot(rvec1 / Lambda, p, 'r--', label='Direto', alpha=0.85)
+    plt.plot(rvec2 / Lambda, pfwh, 'b--', label='FWH', alpha=0.25)
+    plt.plot(rvec2 / Lambda, pfwh2, 'g--', label='FWH2', alpha=0.15)
 
     if title != None:
         plt.title(title)

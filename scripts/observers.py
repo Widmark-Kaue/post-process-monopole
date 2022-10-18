@@ -10,13 +10,17 @@ if not PATH_WRITE.exists():
     PATH_WRITE.mkdir()
 
 
-def probes(number_of_probes: int = 30, lim: tuple = (2, 102), 
-         name_of_archive:str = 'probesTime', field:str = 'p'):
+def probes(
+    number_of_probes: int = 30,
+    lim: tuple = (2, 102),
+    name_of_archive: str = 'probesTime',
+    field: str = 'p',
+):
     p = np.linspace(lim[0], lim[1], number_of_probes)
-    
+
     arq = open(PATH_WRITE / 'templateProbe.txt', 'r').read()
 
-    arq = sub('&',name_of_archive, arq)
+    arq = sub('&', name_of_archive, arq)
     arq = sub('@', field, arq)
 
     write = 'probeLocations\n\t\t(\n'
@@ -25,7 +29,7 @@ def probes(number_of_probes: int = 30, lim: tuple = (2, 102),
     write += '\t\t);'
 
     arq = sub('#', write, arq)
-    
+
     with open(PATH_WRITE / name_of_archive, 'w') as file:
         file.write(arq)
 

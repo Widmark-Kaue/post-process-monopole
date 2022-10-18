@@ -51,7 +51,7 @@ def pressureFlow(
     x: float or np.ndarray,
     t: float or np.ndarray,
     y: float or np.ndarray = 0,
-    M: float = 0.3,
+    M: float = 0.1,
 ):
 
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
@@ -71,9 +71,7 @@ def pressureFlow(
 
     # Termos da solução (eqs. 4.11 4.13 )
     csi = (
-        omega
-        * np.sqrt(x**2 + (1 - M**2) * y**2)
-        / ((1 - M**2) * c0**2)
+        omega*np.sqrt(x**2 + (1 - M**2) * y**2)/((1 - M**2) * c0**2)
     )
 
     eta = -1j * M * k * x / (1 - M**2) - 1j * omega * t
@@ -142,7 +140,7 @@ def importData(
         )[1:]
 
         print(f'Time = {tsim[pos1]} \nPos = {pos1}')
-        return (p - toPa, pfwh, pfwh)
+        return (p - toPa, pfwh, pfwh2)
 
 
 def rmsTime(

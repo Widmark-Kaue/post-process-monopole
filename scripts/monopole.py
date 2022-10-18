@@ -5,6 +5,9 @@ import wave as wv
 #%% Parâmetros de simulação
 microphone = np.linspace(2, 102, 11)
 
+"""  
+32 PPW - MONOPOLO
+"""
 #%% Comportamento temporal
 for m in range(len(microphone)):
     SIM, FWH, FWH2 = wv.importData('32ppw', probe=m)
@@ -21,5 +24,7 @@ wv.plotSpacial((pfwh, pfwh2), p, r=(2,102), tobs=0.5, title=ti)
 #%% RMS
 RMS = wv.rmsTime(SIM, robs=microphone[0]) * 100
 print(RMS)
-
-# %%
+#%%
+""" 
+64 PPW - MONOPOLO
+"""

@@ -46,8 +46,8 @@ def pressure(
     else:
         return p_2_E(t, r), Lambda
 
-def pressureFlow(x:float or np.ndarray = None,
-                t:float or np.ndarray = None,
+def pressureFlow(x:float or np.ndarray,
+                t:float or np.ndarray,
                 y:float or np.ndarray = 0, M:float=0.3):
 
     assert 0<=M<=1, "Número de Mach deve está entre 0 e 1"

@@ -18,7 +18,7 @@ plt.grid()
 plt.legend()
 plt.show()
 
-#%% Comportamento temporal
+# Comportamento temporal
 microphone = np.linspace(2,102, 11)
 for m in range(len(microphone)):
     SIM, FWH, FWH2 = wv.importData('pimpleT3', case = 'monopoleFlow', probe=m)
@@ -42,7 +42,7 @@ microphone = np.linspace(2,102, 11)
 for m in range(len(microphone)):
     SIM, FWH, FWH2 = wv.importData('pimpleT6', case = 'monopoleFlow', probe=m)
 
-    ti = f'Teste6\nComportamento temporal (r = {round(microphone[m],2)} [m])'
+    ti = f'Teste 6\nComportamento temporal (r = {round(microphone[m],2)} [m])'
    
     plt.plot(SIM[0], SIM[1], 'r--', label = 'Cálculo direto', alpha = 0.5)
     plt.plot(FWH[0], FWH[1], 'b--', label = 'FWH1', alpha = 0.85)

@@ -216,7 +216,7 @@ def plotTime(
         plt.plot(t, pfunc(t), 'k', label='Analítico', alpha=0.5)
         plt.plot(t, p, 'r-.', label='Cálculo Direto')
 
-    plt.plot(fwh_t, fwh_p, 'r--', label='FWH', alpha=1)
+    plt.plot(fwh_t, fwh_p, 'b--', label='FWH', alpha=1)
     plt.plot(fwh2_t, fwh2_p, 'g--', label='FWH2', alpha=0.75)
 
     if title != None:

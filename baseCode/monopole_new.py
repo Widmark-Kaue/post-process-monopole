@@ -5,7 +5,7 @@ Created on Sat Oct  8 19:07:26 2022
 
 @author: jsalazar
 """
-
+#%%
 import numpy as np
 import scipy as sp
 import sympy as sy
@@ -90,3 +90,4 @@ data=createDict('X','Y','pprime','gamma','T0','p0','R','omega_num','c0_num',\
                     'ylim','nx','ny')
 outputfile='monopole'+'_'+str(M_num)+'.spydata'
 save_dictionary(data,outputfile)
+# %%

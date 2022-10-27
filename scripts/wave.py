@@ -98,20 +98,21 @@ def importData(
     case: str = 'monopole'
 ) -> tuple:
 
-    PATH_DATA = Path('data', case)
+    PATH_DATA = Path(Path().absolute().parent, 'data', case)
     PROBES  = Path(PATH_DATA ,'probes' ,simulation ,str(time) ,'p.txt')
     FWH     = Path(PATH_DATA,'acousticData',simulation,'FWH-time.dat')
     FWH2    = Path(PATH_DATA,'acousticData',simulation,'FWH2-time.dat')
+
 
     toPa = 101325
 
     if time == 0:
         t, p = np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
-        fwh_t, fwh_p = np.loadtxt(
-            FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
+        
+        fwh_t, fwh_p = np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
         )
-        fwh2_t, fwh2_p = np.loadtxt(
-            FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
+        
+        fwh2_t, fwh2_p = np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
         )
         print(f'Probe: {probe}')
         return ((t, p - toPa), (fwh_t, fwh_p), (fwh2_t, fwh2_p))
@@ -127,16 +128,13 @@ def importData(
         arq.close()
 
         pos1 = np.searchsorted(tsim, time)
-        p = np.loadtxt(
-            PROBES, skiprows=skip + pos1 - 1 * (pos1 != 0), max_rows=1
+        p = np.loadtxt(PROBES, skiprows=skip + pos1 - 1 * (pos1 != 0), max_rows=1
         )[1:]
 
         pos2 = np.searchsorted(tfwh, time)
-        pfwh = np.loadtxt(
-            FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+        pfwh = np.loadtxt(FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
         )[1:]
-        pfwh2 = np.loadtxt(
-            FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+        pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
         )[1:]
 
         print(f'Time = {tsim[pos1]} \nPos = {pos1}')

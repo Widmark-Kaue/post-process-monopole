@@ -1,4 +1,6 @@
 #%% Librarys
+from genericpath import exists
+from importlib.resources import path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -108,12 +110,15 @@ def importData(
 
     if time == 0:
         t, p = np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
-        
-        fwh_t, fwh_p = np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
-        )
-        
-        fwh2_t, fwh2_p = np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
-        )
+
+        try:
+            fwh_t, fwh_p = np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
+            )
+            
+            fwh2_t, fwh2_p = np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
+            )
+        except:
+            fwh_t = fwh_p = fwh2_t, fwh2_p = 0
         print(f'Probe: {probe}')
         return ((t, p - toPa), (fwh_t, fwh_p), (fwh2_t, fwh2_p))
     else:
@@ -121,8 +126,7 @@ def importData(
             PROBES = PROBES.parent.parent / '0' / 'p.txt'
 
         tsim = np.loadtxt(PROBES, usecols=0, ndmin=1)
-        tfwh = np.loadtxt(FWH, usecols=0, skiprows=1, ndmin=1)
-
+        
         arq = open(PROBES, 'r')
         skip = len(findall('#', arq.read())) - 1
         arq.close()
@@ -131,12 +135,15 @@ def importData(
         p = np.loadtxt(PROBES, skiprows=skip + pos1 - 1 * (pos1 != 0), max_rows=1
         )[1:]
 
-        pos2 = np.searchsorted(tfwh, time)
-        pfwh = np.loadtxt(FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
-        )[1:]
-        pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
-        )[1:]
-
+        try:
+            tfwh = np.loadtxt(FWH, usecols=0, skiprows=1, ndmin=1)
+            pos2 = np.searchsorted(tfwh, time)
+            pfwh = np.loadtxt(FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+            )[1:]
+            pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+            )[1:]
+        except:
+            pfwh = pfwh2 = 0
         print(f'Time = {tsim[pos1]} \nPos = {pos1}')
         return (p - toPa, pfwh, pfwh2)
 

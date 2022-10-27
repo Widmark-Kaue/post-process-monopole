@@ -50,6 +50,6 @@ def microphones(
 
 
 #%% Run
-probes(number_of_probes=10_000)
+probes(number_of_probes=40_000)
 microphones(number_of_observer=51)
 # %%

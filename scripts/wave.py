@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from re import S, findall
+from re import findall
 from pathlib import Path
 from scipy.integrate import trapz
 from scipy.interpolate import interp1d

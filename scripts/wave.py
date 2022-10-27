@@ -98,10 +98,10 @@ def importData(
     case: str = 'monopole'
 ) -> tuple:
 
-    PATH_DATA = Path().absolute().parent / 'data' / case
-    PROBES = PATH_DATA / 'probes' / simulation / str(time) / 'p.txt'
-    FWH = PATH_DATA / 'acousticData' / simulation / 'FWH-time.dat'
-    FWH2 = PATH_DATA / 'acousticData' / simulation / 'FWH2-time.dat'
+    PATH_DATA = Path('data', case)
+    PROBES  = Path(PATH_DATA ,'probes' ,simulation ,str(time) ,'p.txt')
+    FWH     = Path(PATH_DATA,'acousticData',simulation,'FWH-time.dat')
+    FWH2    = Path(PATH_DATA,'acousticData',simulation,'FWH2-time.dat')
 
     toPa = 101325
 

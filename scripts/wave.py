@@ -1,6 +1,4 @@
 #%% Librarys
-from genericpath import exists
-from importlib.resources import path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -73,7 +71,9 @@ def pressureFlow(
 
     # Termos da solução (eqs. 4.11 4.13 )
     csi = (
-        omega*np.sqrt(x**2 + (1 - M**2) * y**2)/((1 - M**2) * c0**2)
+        omega
+        * np.sqrt(x**2 + (1 - M**2) * y**2)
+        / ((1 - M**2) * c0**2)
     )
 
     eta = -1j * M * k * x / (1 - M**2) - 1j * omega * t
@@ -94,31 +94,35 @@ def pressureFlow(
 
 
 def importData(
-    simulation: str,
-    probe: int = 2, 
-    time: float = 0, 
-    case: str = 'monopole'
+    simulation: str, probe: int = 2, time: float = 0, case: str = 'monopole'
 ) -> tuple:
 
     PATH_DATA = Path(Path().absolute().parent, 'data', case)
-    PROBES  = Path(PATH_DATA ,'probes' ,simulation ,str(time) ,'p.txt')
-    FWH     = Path(PATH_DATA,'acousticData',simulation,'FWH-time.dat')
-    FWH2    = Path(PATH_DATA,'acousticData',simulation,'FWH2-time.dat')
-
+    PROBES = Path(PATH_DATA, 'probes', simulation, str(time), 'p.txt')
+    FWH = Path(PATH_DATA, 'acousticData', simulation, 'FWH-time.dat')
+    FWH2 = FWH.with_name('FWH2-time.dat')
 
     toPa = 101325
 
     if time == 0:
-        t, p = np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
+        t, p = (
+            np.loadtxt(PROBES, usecols=(0, probe + 1), unpack=True)
+            if PROBES.exists()
+            else (0, 0)
+        )
 
-        try:
-            fwh_t, fwh_p = np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True
-            )
-            
-            fwh2_t, fwh2_p = np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True
-            )
-        except:
-            fwh_t = fwh_p = fwh2_t, fwh2_p = 0
+        fwh_t, fwh_p = (
+            np.loadtxt(FWH, usecols=(0, probe + 1), skiprows=1, unpack=True)
+            if FWH.exists()
+            else (0, 0)
+        )
+
+        fwh2_t, fwh2_p = (
+            np.loadtxt(FWH2, usecols=(0, probe + 1), skiprows=1, unpack=True)
+            if FWH2.exists()
+            else (0, 0)
+        )
+
         print(f'Probe: {probe}')
         return ((t, p - toPa), (fwh_t, fwh_p), (fwh2_t, fwh2_p))
     else:
@@ -126,23 +130,26 @@ def importData(
             PROBES = PROBES.parent.parent / '0' / 'p.txt'
 
         tsim = np.loadtxt(PROBES, usecols=0, ndmin=1)
-        
+
         arq = open(PROBES, 'r')
         skip = len(findall('#', arq.read())) - 1
         arq.close()
 
         pos1 = np.searchsorted(tsim, time)
-        p = np.loadtxt(PROBES, skiprows=skip + pos1 - 1 * (pos1 != 0), max_rows=1
+        p = np.loadtxt(
+            PROBES, skiprows=skip + pos1 - 1 * (pos1 != 0), max_rows=1
         )[1:]
 
-        try:
+        if FWH.exists():
             tfwh = np.loadtxt(FWH, usecols=0, skiprows=1, ndmin=1)
             pos2 = np.searchsorted(tfwh, time)
-            pfwh = np.loadtxt(FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+            pfwh = np.loadtxt(
+                FWH, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
             )[1:]
-            pfwh2 = np.loadtxt(FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
+            pfwh2 = np.loadtxt(
+                FWH2, skiprows=1 + pos2 - 1 * (pos2 != 0), max_rows=1
             )[1:]
-        except:
+        else:
             pfwh = pfwh2 = 0
         print(f'Time = {tsim[pos1]} \nPos = {pos1}')
         return (p - toPa, pfwh, pfwh2)
@@ -263,42 +270,3 @@ def plotSpacial(
     plt.legend()
     plt.grid()
     plt.show()
-
-
-#%%
-# def pressureFlow(
-#     r: float or np.ndarray = None,
-#     t: float or np.ndarray = None
-# )-> float or np.ndarray:
-
-#     # constantes globais
-#     rf = 0.05715 / 2
-#     S = 0.1
-#     c0 = 340.29
-#     c = 331.45
-#     freq = 100
-#     omega = freq * 2 * np.pi
-#     T0 = 273.15
-#     T = (c0 / c) ** 2 * T0
-#     rho0 = 101325 / (287.058 * T)   #% Eq. dos Gases ideias
-#     area = 2 * np.pi * rf
-#     velocity = S / area
-#     Lambda = c / freq
-
-#     M = 0.3
-#     y = 0
-#     x = np.arange(-100, 100, 0.13)
-#     k = omega/c0
-
-#     ksi = omega*np.sqrt(x**2 + (1-M**2)*y**2)/((1-M**2)*c0)
-#     eta = lambda t1: -1j*M/(1-M**2)*k*x-1j*omega*t1
-#     H0flow = hankel1(0, ksi)
-#     H1flow = hankel1(1, ksi)
-
-#     T1 = omega/(4*c0**3 *(1-M**2)**(3/2))
-#     T2 = M*H0flow - 1j*x*H1flow/np.sqrt(x**2+(1-M**2)*y**2)
-#     T3 = lambda t1: np.exp(eta(t1))
-#     Gx = lambda t1: T1*T2*T3(t1)
-#     GtFlow =
-
-#     return 0

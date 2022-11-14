@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 from re import findall
 from pathlib import Path
-from src.datadrive import PATH_DATA
 from scipy.integrate import trapz
+from src.datadrive import PATH_DATA
 from scipy.signal import fftconvolve
 from scipy.interpolate import interp1d
 from scipy.special import hankel2, hankel1
@@ -51,47 +51,50 @@ def pressure(
 
 def pressureFlow(
     x: float or np.ndarray,
-    t: float or np.ndarray,
-    y: float or np.ndarray = 0,
-    M: float = 0.1,
+    y: float or np.ndarray  = 0,
+    t: float                = 0.6,
+    alpha:float             = np.log(2)/9,
+    freq: float             = 10,
+    M: float                = 0.5,
+    gamma:float             = 1.4,
+    PTR: tuple              = (101325, 298.15, 8314.46261815324/28.9)
 ):
 
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
-    if type(y) != np.ndarray:
-        y = y * np.ones(len(x))
-
+    
     # Constantes Globais
-    c0 = 340.29
-    c = 331.45
-    T0 = 273.15
-    T = (c0 / c) ** 2 * T0
-    rho0 = 101325 / (287.058 * T)   #% Eq. dos Gases ideias
-    S = 0.1
-    freq = 100
-    omega = freq * 2 * np.pi
-    k = omega / c0
+    p0, T0, R   = PTR
+    omega       = freq*2*np.pi
+    c0          = np.sqrt(gamma*R*T0)
+    k           = omega/c0
+    epsilon     = p0*gamma
+    deltax      = x[1]-x[0]
+ 
+    # Gaussian distribution of amplitude
+    f = epsilon*np.exp(-alpha*(x**2+y**2))
 
-    # Termos da solução (eqs. 4.11 4.13 )
-    csi = (
-        omega
-        * np.sqrt(x**2 + (1 - M**2) * y**2)
-        / ((1 - M**2) * c0**2)
-    )
+    # Green's function
+    ksi = omega*np.sqrt(x**2 +(1-M**2)*y**2)/((1-M**2)*c0)
+    eta = -1j*M*k*x/(1-M**2) -1j*omega*t
 
-    eta = -1j * M * k * x / (1 - M**2) - 1j * omega * t
-    H0Flow = hankel1(0, csi)
-    H1Flow = hankel1(1, csi)
+    G = 1j/(4*c0**2 + np.sqrt(1 - M**2))
+    G*= hankel1(0,ksi)*np.exp(eta)
 
-    T1 = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
-    T2 = M * H0Flow - 1j * x * H1Flow / np.sqrt(x**2 + (1 - M**2) * y**2)
-    T3 = np.exp(eta)
-    Gx = T1 * T2 * T3   # derivada em x da função de Green
-    Gt = (
-        1j * (-1j * omega) / (4 * c0**2 * np.sqrt(1 - M**2)) * H0Flow * T3
-    )   # derivada em t da função de Green
-    f = rho0 * (c0**2) * S
-    pFlow = (f * (Gt + M * Gx)).imag
+    # Derivate of Green's function
+    dGdx = omega/(4*c0**3 * (1-M**2)**(3/2))
+    if y == 0 and (0 in x):
+        x[list(x).index(0)] = 1
 
+    dGdx*=(M*hankel1(0, ksi)-1j*x*hankel1(1,ksi)/np.sqrt(x**2+(1-M**2)*y**2))
+    dGdx*= np.exp(eta)
+
+    dGdt = G*(-1j*omega)
+
+    # Solution for the convolution product
+    H = np.imag(dGdt + M*c0*dGdx)
+
+    pFlow = fftconvolve(f, H, 'same')*deltax
+    
     return pFlow
 
 def pressureFlow2(

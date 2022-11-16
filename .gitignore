@@ -4,7 +4,9 @@ __pycache__/
 *$py.class
 
 # My ignore
-data/
+monopole/
+monopoleFlow/
+
 # C extensions
 *.so
 

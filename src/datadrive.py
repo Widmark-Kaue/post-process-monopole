@@ -1,7 +1,9 @@
 from pathlib import Path
 # from google.colab import drive
 
-PATH_DATA = Path(Path().absolute().parent, 'data')
+PATH_DATA = Path('data')
 
-# if not PATH_DATA.exists():
-#     drive.mount('content/drive')
+PATH_WRITE = Path('observers')
+if not PATH_WRITE.exists():
+    PATH_WRITE.mkdir()
+

@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3252129ef0130208c729915a3e41484265aeb45b46006e2c56ed6b5ac92f9197
-size 378
+&
+{
+        // Where to load it from
+        libs ( "libsampling.so" );
+        type            probes;
+        // Name of the directory for probe data
+        name            &;
+        // Write at same frequency as fields
+        writeControl   timeStep;
+        writeInterval  1;
+        // Fields to be probed
+        fields
+        (
+            @
+        );
+
+        probeLocations
+		(
+        #
+        
+}

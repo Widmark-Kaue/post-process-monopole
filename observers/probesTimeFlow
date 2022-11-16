@@ -16,8 +16,6 @@ probesTimeFlow
 
         probeLocations
 		(
-        probeLocations
-		(
 			(-100.0 0 0)
 			(-99.995 0 0)
 			(-99.99 0 0)
@@ -40019,4 +40017,5 @@ probesTimeFlow
 			(99.995 0 0)
 			(100.0 0 0)
 		);
+        
 }

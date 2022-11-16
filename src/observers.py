@@ -1,13 +1,15 @@
 #%% Librarys
 import numpy as np
+
+from src.datadrive import PATH_WRITE
 from re import sub
 from pathlib import Path
 from string import ascii_letters
 
 #%% Funções
-PATH_WRITE = Path().absolute().parent / 'observers'
-if not PATH_WRITE.exists():
-    PATH_WRITE.mkdir()
+# PATH_WRITE = Path().absolute().parent / 'observers'
+# if not PATH_WRITE.exists():
+#     PATH_WRITE.mkdir()
 
 
 def probes(
@@ -50,6 +52,6 @@ def microphones(
 
 
 #%% Run
-probes(number_of_probes=40_000)
-microphones(number_of_observer=51)
+probes(number_of_probes=40_000, lim = (-100, 100), name_of_archive='probesTimeFlow')
+# microphones(number_of_observer=51)
 # %%

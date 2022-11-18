@@ -51,135 +51,143 @@ def pressure(
 
 def pressureFlow(
     x: float or np.ndarray,
-    y: float or np.ndarray  = 0,
-    t: float                = 0.6,
-    alpha:float             = np.log(2)/9,
-    freq: float             = 10,
-    M: float                = 0.5,
-    gamma:float             = 1.4,
-    PTR: tuple              = (101325, 298.15, 8314.46261815324/28.9)
+    y: float or np.ndarray = 0,
+    t: float = 0.6,
+    alpha: float = np.log(2) / 9,
+    freq: float = 10,
+    M: float = 0.5,
+    gamma: float = 1.4,
+    PTR: tuple = (101325, 298.15, 8314.46261815324 / 28.9),
 ):
 
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
-    
+
     # Constantes Globais
-    p0, T0, R   = PTR
-    omega       = freq*2*np.pi
-    c0          = np.sqrt(gamma*R*T0)
-    k           = omega/c0
-    epsilon     = p0*gamma
-    deltax      = x[1]-x[0]
- 
+    p0, T0, R = PTR
+    omega = freq * 2 * np.pi
+    c0 = np.sqrt(gamma * R * T0)
+    k = omega / c0
+    epsilon = p0 * gamma
+    deltax = x[1] - x[0]
+
     # Gaussian distribution of amplitude
-    f = epsilon*np.exp(-alpha*(x**2+y**2))
+    f = epsilon * np.exp(-alpha * (x**2 + y**2))
 
     # Green's function
-    ksi = omega*np.sqrt(x**2 +(1-M**2)*y**2)/((1-M**2)*c0)
-    eta = -1j*M*k*x/(1-M**2) -1j*omega*t
+    ksi = omega * np.sqrt(x**2 + (1 - M**2) * y**2) / ((1 - M**2) * c0)
+    eta = -1j * M * k * x / (1 - M**2) - 1j * omega * t
 
-    G = 1j/(4*c0**2 + np.sqrt(1 - M**2))
-    G*= hankel1(0,ksi)*np.exp(eta)
+    G = 1j / (4 * c0**2 + np.sqrt(1 - M**2))
+    G *= hankel1(0, ksi) * np.exp(eta)
 
     # Derivate of Green's function
-    dGdx = omega/(4*c0**3 * (1-M**2)**(3/2))
+    dGdx = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
     if y == 0 and (0 in x):
         x[list(x).index(0)] = 1
 
-    dGdx*=(M*hankel1(0, ksi)-1j*x*hankel1(1,ksi)/np.sqrt(x**2+(1-M**2)*y**2))
-    dGdx*= np.exp(eta)
+    dGdx *= M * hankel1(0, ksi) - 1j * x * hankel1(1, ksi) / np.sqrt(
+        x**2 + (1 - M**2) * y**2
+    )
+    dGdx *= np.exp(eta)
 
-    dGdt = G*(-1j*omega)
+    dGdt = G * (-1j * omega)
 
     # Solution for the convolution product
-    H = np.imag(dGdt + M*c0*dGdx)
+    H = np.imag(dGdt + M * c0 * dGdx)
 
-    pFlow = fftconvolve(f, H, 'same')*deltax
-    
+    pFlow = fftconvolve(f, H, 'same') * deltax
+
     return pFlow
 
+
 def pressureFlow2(
-    xlim:tuple  = (-200,200),
-    ylim:tuple  = (-200,-200),
-    nxy:tuple   = (401,401),
-    t: float    = 0.6,
-    alpha:float = np.log(2)/9,
-    freq:float  = 10,
-    M: float    = 0.5, 
-    gamma:float = 1.4,
-    PTR: tuple  = (101325, 298.15, 8314.46261815324/28.9 )   
+    xlim: tuple = (-200, 200),
+    ylim: tuple = (-200, -200),
+    nxy: tuple = (401, 401),
+    t: float = 0.6,
+    alpha: float = np.log(2) / 9,
+    freq: float = 10,
+    M: float = 0.5,
+    gamma: float = 1.4,
+    PTR: tuple = (101325, 298.15, 8314.46261815324 / 28.9),
 ):
 
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
 
     # vetores
-    nx, ny  = nxy 
-    x       = np.linspace(xlim[0],xlim[1], nx)
-    y       = np.linspace(ylim[0],ylim[1], ny)
-    deltax  = x[1] - x[0]
-    deltay  = y[1] - y[0]
+    nx, ny = nxy
+    x = np.linspace(xlim[0], xlim[1], nx)
+    y = np.linspace(ylim[0], ylim[1], ny)
+    deltax = x[1] - x[0]
+    deltay = y[1] - y[0]
 
-    f       = np.zeros(nxy, dtype=float)
-    H       = np.zeros(nxy, dtype=float)
-    
+    f = np.zeros(nxy, dtype=float)
+    H = np.zeros(nxy, dtype=float)
 
     # Constantes Globais
-    p0, T0, R   = PTR    
-    omega       = freq * 2 * np.pi
-    c0          = np.sqrt(gamma * R * T0)
-    k           = omega/c0
-    epsilon     = p0 * gamma
+    p0, T0, R = PTR
+    omega = freq * 2 * np.pi
+    c0 = np.sqrt(gamma * R * T0)
+    k = omega / c0
+    epsilon = p0 * gamma
 
-    for i,xi in enumerate(x):
-        for j,yj in enumerate(y):
+    for i, xi in enumerate(x):
+        for j, yj in enumerate(y):
             try:
-                del(G, dGdt, dGdx)
+                del (G, dGdt, dGdx)
             except:
                 pass
 
             # Gaussian distribution of amplitude
-            f[i,j] = epsilon*np.exp(-alpha*(xi**2+yj**2))
+            f[i, j] = epsilon * np.exp(-alpha * (xi**2 + yj**2))
 
             # Green's function
-            if xi == 0: 
-                xksi = 1e-100 # evitar indeterminação
+            if xi == 0:
+                xksi = 1e-100   # evitar indeterminação
             else:
                 xksi = xi
-            ksi = omega*np.sqrt(xksi**2 + (1 - M**2) * yj**2)/((1 - M**2) * c0)
-            eta = -1j*M*k*xi/(1 - M**2)-1j*omega*t
+            ksi = (
+                omega
+                * np.sqrt(xksi**2 + (1 - M**2) * yj**2)
+                / ((1 - M**2) * c0)
+            )
+            eta = -1j * M * k * xi / (1 - M**2) - 1j * omega * t
 
-            G = 1j/(4*c0**2 + np.sqrt(1 - M**2))
-            G*= hankel1(0,ksi)*np.exp(eta)
+            G = 1j / (4 * c0**2 + np.sqrt(1 - M**2))
+            G *= hankel1(0, ksi) * np.exp(eta)
 
             # Derivate of Green's function
-            dGdx = omega/(4*c0**3 * (1-M**2)**(3/2))
+            dGdx = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
             if xi == 0:
-                dGdx*=(M*hankel1(0, ksi)-1j*hankel1(1,ksi))
+                dGdx *= M * hankel1(0, ksi) - 1j * hankel1(1, ksi)
             else:
-                dGdx*=(M*hankel1(0, ksi)-1j*xi*hankel1(1,ksi)/np.sqrt(xi**2+(1-M**2)*yj**2))
-            dGdx*= np.exp(eta)
+                dGdx *= M * hankel1(0, ksi) - 1j * xi * hankel1(
+                    1, ksi
+                ) / np.sqrt(xi**2 + (1 - M**2) * yj**2)
+            dGdx *= np.exp(eta)
 
-            dGdt = G*(-1j*omega)
+            dGdt = G * (-1j * omega)
 
             # Solution the convolution product
-            H[i,j] = (dGdt + M*c0*dGdx).imag
-    
+            H[i, j] = (dGdt + M * c0 * dGdx).imag
+
     pFlow = fftconvolve(f, H, 'same') * deltax * deltay
     print(len(pFlow))
     print(pFlow.shape)
 
     # Plot
     print(ny)
-    Xplt = np.arange(len(pFlow))*deltax - abs(xlim[0])
-    Yplt = pFlow[:,int( (ny -1)/2 )] 
+    Xplt = np.arange(len(pFlow)) * deltax - abs(xlim[0])
+    Yplt = pFlow[:, int((ny - 1) / 2)]
     plt.plot(Xplt, Yplt)
-    plt.xlim([-100,100])
+    plt.xlim([-100, 100])
     plt.xlabel('x [m]')
     plt.ylabel('P [Pa]')
     plt.grid()
     plt.show()
 
-    [X,Y] = np.meshgrid(x,y)
-    fig, ax = plt.subplots(1,1)
+    [X, Y] = np.meshgrid(x, y)
+    fig, ax = plt.subplots(1, 1)
     ax.contourf(X, Y, pFlow.T)
     ax.set_title('Contour Plot')
     ax.set_xlabel('x')
@@ -196,7 +204,7 @@ def importData(
     simulation: str, probe: int = 2, time: float = 0, case: str = 'monopole'
 ) -> tuple:
 
-    PATH_DATA_CASE = Path( PATH_DATA, case)
+    PATH_DATA_CASE = Path(PATH_DATA, case)
     PROBES = Path(PATH_DATA_CASE, 'probes', simulation, str(time), 'p.txt')
     FWH = Path(PATH_DATA_CASE, 'acousticData', simulation, 'FWH-time.dat')
     FWH2 = FWH.with_name('FWH2-time.dat')

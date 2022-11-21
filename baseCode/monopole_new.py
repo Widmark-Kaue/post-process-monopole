@@ -92,6 +92,7 @@ for i in range(len(xrange)):
 # pprime=-np.imag(sp.signal.fftconvolve(f_num,dGdt_num+M_num*c0_num*dGdx_num,'same')*deltax*deltay)
 pprime = sp.signal.fftconvolve(f_num, H_num, 'same') * deltax * deltay
 
+np.savetxt('pprime.dat', pprime, header='X      Y')
 
 plt.plot(np.arange(len(pprime)) * deltax - xlim, pprime[:, int((ny - 1) / 2)])
 plt.xlim([-100, 100])

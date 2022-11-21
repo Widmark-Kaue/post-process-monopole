@@ -101,8 +101,8 @@ def pressureFlow(
 
 
 def pressureFlow2(
-    xlim: tuple = (200, -200),
-    ylim: tuple = (200, -200),
+    xlim: tuple = (-200, 200),
+    ylim: tuple = (-200, 200),
     nxy: tuple = (401, 401),
     t: float = 0.6,
     alpha: float = np.log(2) / 9,
@@ -115,21 +115,21 @@ def pressureFlow2(
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
 
     # vetores
-    nx, ny = nxy
-    x = np.linspace(xlim[0], xlim[1], nx)
-    y = np.linspace(ylim[0], ylim[1], ny)
-    deltax = x[1] - x[0]
-    deltay = y[1] - y[0]
+    nx, ny  = nxy
+    x       = np.linspace(xlim[0], xlim[1], nx)
+    y       = np.linspace(ylim[0], ylim[1], ny)
+    deltax  = x[1] - x[0]
+    deltay  = y[1] - y[0]
 
     f = np.zeros(nxy, dtype=float)
     H = np.zeros(nxy, dtype=float)
 
     # Constantes Globais
-    p0, T0, R = PTR
-    omega = freq * 2 * np.pi
-    c0 = np.sqrt(gamma * R * T0)
-    k = omega / c0
-    epsilon = p0 * gamma
+    p0, T0, R   = PTR
+    omega       = freq * 2 * np.pi
+    c0          = np.sqrt(gamma * R * T0)
+    k           = omega / c0
+    epsilon     = p0 * gamma
 
     for i, xi in enumerate(x):
         for j, yj in enumerate(y):
@@ -146,11 +146,7 @@ def pressureFlow2(
                 xksi = 1e-100   # evitar indeterminação
             else:
                 xksi = xi
-            ksi = (
-                omega
-                * np.sqrt(xksi**2 + (1 - M**2) * yj**2)
-                / ((1 - M**2) * c0)
-            )
+            ksi = (omega* np.sqrt(xksi**2 + (1 - M**2) * yj**2)/ ((1 - M**2) * c0))
             eta = -1j * M * k * xi / (1 - M**2) - 1j * omega * t
 
             G = 1j / (4 * c0**2 + np.sqrt(1 - M**2))

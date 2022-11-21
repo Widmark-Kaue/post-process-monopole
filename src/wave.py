@@ -101,8 +101,8 @@ def pressureFlow(
 
 
 def pressureFlow2(
-    xlim: tuple = (-200, 200),
-    ylim: tuple = (-200, -200),
+    xlim: tuple = (200, -200),
+    ylim: tuple = (200, -200),
     nxy: tuple = (401, 401),
     t: float = 0.6,
     alpha: float = np.log(2) / 9,

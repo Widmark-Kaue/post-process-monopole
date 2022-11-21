@@ -60,10 +60,10 @@ dGdx = sy.diff(G, x)
 H = sy.im(dGdt + M_num * c0 * dGdx)
 
 for j in range(len(t_num)):
-    dGdt_num = np.zeros(len(xrange), dtype=complex)
-    dGdx_num = np.zeros(len(xrange), dtype=complex)
-    H_num = np.zeros(len(xrange), dtype=float)
-    f_num = np.zeros(len(xrange), dtype=float)
+    dGdt_num = np.zeros((len(xrange)), dtype=complex)
+    dGdx_num = np.zeros((len(xrange)), dtype=complex)
+    H_num = np.zeros((len(xrange)), dtype=float)
+    f_num = np.zeros((len(xrange)), dtype=float)
 
     for i in range(len(xrange)):
         H_num[i] = H.xreplace(
@@ -95,7 +95,7 @@ for j in range(len(t_num)):
     plt.show()
 
     arqsave = np.column_stack((xran, pprime))
-    pathsave = Path(Path().parent, PATH_DATA, f'teste1{t_num[j]}s.dat')
+    pathsave = Path(Path().parent, PATH_DATA, f'teste1{t_num[j]}s.dat').absolute()
 
     np.savetxt(pathsave, arqsave, header='x P')
 

@@ -1,5 +1,6 @@
 #%% Librarys
 import numpy as np
+import sympy as sy
 import matplotlib.pyplot as plt
 
 from re import findall
@@ -114,15 +115,37 @@ def pressureFlow2(
 
     assert 0 <= M <= 1, 'Número de Mach deve está entre 0 e 1'
 
-    # vetores
+    # Vetores
     nx, ny  = nxy
-    x       = np.linspace(xlim[0], xlim[1], nx)
-    y       = np.linspace(ylim[0], ylim[1], ny)
+    x       = np.linspace(xlim[0], xlim[1], nx, dtype=float)
+    y       = np.linspace(ylim[0], ylim[1], ny, dtype=float)
     deltax  = x[1] - x[0]
     deltay  = y[1] - y[0]
 
+    # Funções da convolução
     f = np.zeros(nxy, dtype=float)
     H = np.zeros(nxy, dtype=float)
+
+
+    # refino em x
+    
+    # search_pos = lambda arr, val: int(np.argwhere(arr==val)[0][0])
+    # if 0 in x:
+    #     n0    = search_pos(x,0)
+    #     x     = np.delete(x, n0)
+    #     y     = np.delete(y, n0)
+        # xIns  = np.linspace(x[n0-1],x[n0+1],int(0.2*nx))
+        # xIns  = np.delete(xIns, (0,-1))
+        # if 0 in xIns:
+        #     n1 = search_pos(xIns, 0)
+        #     xIns = np.delete(xIns, n1)
+        
+        # x = np.delete(np.insert(x,n0, xIns), n0+len(xIns))
+        # print(f'tam x = {len(x)}')
+        # print(f'tam y = {len(y)}')
+        # assert not (0 in x), "puta que pariu viu!"
+
+   
 
     # Constantes Globais
     p0, T0, R   = PTR
@@ -131,7 +154,49 @@ def pressureFlow2(
     k           = omega / c0
     epsilon     = p0 * gamma
 
+    # Variáveis símbolicas
+    xSy, ySy, tSy, etaSy = sy.symbols('xSy ySy tSy etaSy', real = True)
+
+    GSy = (
+        sy.I/ (4 * c0**2 * sy.sqrt(1 - M**2))
+        * sy.hankel1(
+            0,
+            omega * sy.sqrt(xSy**2 + (1 - M**2) * ySy**2) 
+            / (c0 * (1 - M**2)))
+        * sy.exp(etaSy)
+        )
+
+    hankel01Sy = (
+        sy.hankel1(
+                0,
+                omega*sy.sqrt(xSy**2+(1-M**2)*ySy**2)
+                /(c0*(1- M**2))
+                  )
+                )
+    hankel11Sy = (
+        sy.hankel1(
+            1,
+            omega*sy.sqrt(xSy**2+(1-M**2)*ySy**2)
+            /(c0*(1- M**2))
+                  )
+                )
+
+    dGdxSy = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
+    dGdxSy *= (
+        M * hankel01Sy- sy.I * (xSy) * hankel11Sy
+        / sy.sqrt(xSy**2 + (1 - M**2) * ySy**2) 
+            )
+    dGdxSy *= sy.exp(etaSy)
+
+    dGdtSy = GSy * (-sy.I * omega)
+    # dGdtSy = sy.diff(GSy, tSy)
+    # dGdxSy = sy.diff(GSy, xSy)
+
+    HSy = sy.im(dGdtSy + M * c0 * dGdxSy)
+
     for i, xi in enumerate(x):
+        if i%100 ==1:
+            print(f'H[{i-1}] =\n{H[i-1,:11]}')
         for j, yj in enumerate(y):
             try:
                 del (G, dGdt, dGdx)
@@ -142,37 +207,39 @@ def pressureFlow2(
             f[i, j] = epsilon * np.exp(-alpha * (xi**2 + yj**2))
 
             # Green's function
-            if xi == 0:
-                xksi = 1e-100   # evitar indeterminação
-            else:
-                xksi = xi
-            ksi = (omega* np.sqrt(xksi**2 + (1 - M**2) * yj**2)/ ((1 - M**2) * c0))
+            ksi = (omega* np.sqrt(xi**2 + (1 - M**2) * yj**2)/ ((1 - M**2) * c0))
             eta = -1j * M * k * xi / (1 - M**2) - 1j * omega * t
 
-            G = 1j / (4 * c0**2 + np.sqrt(1 - M**2))
-            G *= hankel1(0, ksi) * np.exp(eta)
-
-            # Derivate of Green's function
-            dGdx = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
-            if xi == 0:
-                dGdx *= M * hankel1(0, ksi) - 1j * hankel1(1, ksi)
+            if xi == 0 and yj:
+                H[i,j] = HSy.xreplace(
+                    {
+                        xSy: xi,
+                        ySy: yj,
+                        etaSy: eta,
+                    }
+                ).evalf()
+                print('Passou aqui')
             else:
-                dGdx *= M * hankel1(0, ksi) - 1j * xi * hankel1(
-                    1, ksi
-                ) / np.sqrt(xi**2 + (1 - M**2) * yj**2)
-            dGdx *= np.exp(eta)
+                G = 1j / (4 * c0**2 + np.sqrt(1 - M**2))
+                G *= hankel1(0, ksi) * np.exp(eta)
 
-            dGdt = G * (-1j * omega)
+                # Derivate of Green's function
+                dGdx = omega / (4 * c0**3 * (1 - M**2) ** (3 / 2))
+                dGdx *= (
+                    M * hankel1(0, ksi) - 1j * xi * hankel1(1, ksi) 
+                    / np.sqrt(xi**2 + (1 - M**2) * yj**2)
+                        )
+                dGdx *= np.exp(eta)
 
-            # Solution the convolution product
-            H[i, j] = (dGdt + M * c0 * dGdx).imag
+                dGdt = G * (-1j * omega)
+
+                # Solution the convolution product
+                H[i, j] = (dGdt + M * c0 * dGdx).imag
 
     pFlow = fftconvolve(f, H, 'same') * deltax * deltay
-    print(len(pFlow))
-    print(pFlow.shape)
+    print(f'pFlow =\n{pFlow[:11, int((ny-1)/2)]}')
 
     # Plot
-    print(ny)
     Xplt = np.arange(len(pFlow)) * deltax - abs(xlim[0])
     Yplt = pFlow[:, int((ny - 1) / 2)]
     plt.plot(Xplt, Yplt)
@@ -193,7 +260,7 @@ def pressureFlow2(
 
     plt.show()
 
-    return pFlow
+    return pFlow, (Xplt, Yplt)
 
 
 def importData(
@@ -373,3 +440,5 @@ def plotSpacial(
     plt.legend()
     plt.grid()
     plt.show()
+
+# %%

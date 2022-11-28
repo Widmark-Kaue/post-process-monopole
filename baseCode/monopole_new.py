@@ -10,7 +10,7 @@ import numpy as np
 import scipy as sp
 import sympy as sy
 import matplotlib.pyplot as plt
-from spyder_kernels.utils.iofuncs import save_dictionary
+# from spyder_kernels.utils.iofuncs import save_dictionary
 
 
 def createDict(*args):
@@ -44,9 +44,9 @@ t_num = 2
 epsilon_num = p0 * gamma
 y_num = 0
 xlim = 200
-ylim = 200
+ylim = 5
 nx = 401
-ny = 401
+ny = 11
 
 f = epsilon * sy.exp(-alpha * (x**2 + y**2))
 
@@ -71,7 +71,7 @@ for i in range(len(xrange)):
     for j in range(len(yrange)):
         H_num[i, j] = H.xreplace(
             {
-                x: xrange[i],
+                x: xrange[i],==0
                 y: yrange[j],
                 omega: omega_num,
                 t: t_num,
@@ -129,5 +129,5 @@ data = createDict(
     'ny',
 )
 outputfile = 'monopole' + '_' + str(M_num) + '.spydata'
-save_dictionary(data, outputfile)
+# save_dictionary(data, outputfile)
 # %%

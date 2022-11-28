@@ -13,6 +13,7 @@ jupyter = "^1.0.0"
 ipynb = "^0.5.1"
 pathlib = "^1.0.1"
 sympy = "^1.11.1"
+ipykernel = "^6.18.1"
 
 [tool.poetry.dev-dependencies]
 

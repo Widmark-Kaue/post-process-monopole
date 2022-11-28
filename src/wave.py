@@ -264,11 +264,15 @@ def pressureFlow2(
 
 
 def importData(
-    simulation: str, probe: int = 2, time: float = 0, case: str = 'monopole'
+    simulation: str,
+    test:str, 
+    probe: int = 2, 
+    time: float = 0, 
+    case: str = 'monopole'
 ) -> tuple:
 
     PATH_DATA_CASE = Path(PATH_DATA, case)
-    PROBES = Path(PATH_DATA_CASE, 'probes', simulation, str(time), 'p.txt')
+    PROBES = Path(PATH_DATA_CASE, 'probes', test, simulation,str(time), 'p.txt')
     FWH = Path(PATH_DATA_CASE, 'acousticData', simulation, 'FWH-time.dat')
     FWH2 = FWH.with_name('FWH2-time.dat')
 

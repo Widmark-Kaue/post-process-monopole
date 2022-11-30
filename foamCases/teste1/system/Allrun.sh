@@ -7,7 +7,7 @@ cat $FOAM_RUN
 source $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 
-foamCleanTuturials
+foamCleanTutorials
 
 cp -ar ../../mesh/msh/teste.msh .
 

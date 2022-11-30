@@ -22,6 +22,7 @@ constant/polyMesh/*
 !constant/polyMesh/blockMeshDict
 constant/cellToRegion
 *.OpenFOAM
+dynamicCode
 
 # C extensions
 *.so

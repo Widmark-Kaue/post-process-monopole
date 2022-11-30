@@ -1,8 +1,9 @@
 SetFactory("OpenCASCADE");
 
 // Parâmetros
-dinner  = DefineNumber[100,Name "Parameters/dinner"];
-dout    = DefineNumber[200,Name "Parameters/dout"];
+lambda  = DefineNumber[34.653698762,Name "Parameter/lambda"];
+dinner  = DefineNumber[lambda,Name "Parameters/dinner"];
+dout    = DefineNumber[30*lambda,Name "Parameters/dout"];
 cos45   = DefineNumber[0.707106781, Name "Parameters/cos"];
 
 // Pontos quadrado interno

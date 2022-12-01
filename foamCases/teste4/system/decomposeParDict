@@ -11,52 +11,12 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      controlDict;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     myrhoCentralFoam;//rhoPimpleFoam;
+numberOfSubdomains 6;
 
-startFrom       latestTime;//latestTime;
-
-startTime       0;
-
-stopAt          endTime;
-
-endTime         4;
-
-deltaT          2.5e-5;
-
-writeControl    adjustableRunTime;
-
-writeInterval   0.01;
-
-purgeWrite      0;//200;
-
-writeFormat     binary;
-
-writePrecision  10;
-
-writeCompression off;//on;
-
-timeFormat      general;
-
-timePrecision   6;
-
-runTimeModifiable true;
-
-adjustTimeStep  false;
-
-maxCo           0.3;
-
-maxDeltaT       1e-5;
-
-functions
-{
- #include "probes"
-// #include "probesTimeFlow"
- //#include "average"
-//  #include "probesTimeFlow10"
-}
+method          scotch;
 
 // ************************************************************************* //

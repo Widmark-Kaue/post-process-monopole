@@ -10,6 +10,7 @@ monopoleFlow/
 # OpenFoam ignore
 *.gz
 log.*
+log[0-9].*
 postProcessing
 *~
 processor*

@@ -55,7 +55,7 @@ functions
 {
  #include "probes"
 // #include "probesTimeFlow"
- //#include "average"
+ #include "average"
 //  #include "probesTimeFlow10"
 }
 

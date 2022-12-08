@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         4;
+endTime         2;
 
 deltaT          2.5e-5;
 
@@ -55,7 +55,7 @@ functions
 {
  #include "probes"
 // #include "probesTimeFlow"
- //#include "average"
+ #include "average"
 //  #include "probesTimeFlow10"
 }
 

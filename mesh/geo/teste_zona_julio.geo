@@ -3,20 +3,15 @@ SetFactory("OpenCASCADE");
 // Parâmetros de controle
 lambda      = DefineNumber[34.653698762, Name "Parâmetros Gerais/lambda"];
 rinner      = DefineNumber[lambda,       Name "Parâmetros Gerais/rinner"];
-rmiddle1    = DefineNumber[100,           Name "Parâmetros Gerais/rmiddle1"];
-rmiddle2    = DefineNumber[200,          Name "Parâmetros Gerais/rmiddle2"];
+rmiddle     = DefineNumber[200,          Name "Parâmetros Gerais/rmiddle"];
 rout        = DefineNumber[400,          Name "Parâmetros Gerais/rout"];
 cos45       = DefineNumber[0.707106781,  Name "Parâmetros Gerais/cos"];
 
 // Parâmetros livres
 rI          = DefineNumber[rinner/lambda,   Name "Parâmetros normalizados por lambda/rinner"];
-rM1         = DefineNumber[rmiddle1/lambda, Name "Parâmetros normalizados por lambda/rmiddle1"];
-rM2         = DefineNumber[rmiddle2/lambda, Name "Parâmetros normalizados por lambda/rmiddle2"];
+rM          = DefineNumber[rmiddle/lambda, Name "Parâmetros normalizados por lambda/rmiddle"];
 rO          = DefineNumber[rout/lambda,     Name "Parâmetros normalizados por lambda/rout"];
 
-
-// Centro arco de circunferência
-Point(0) = {0, 0, 0, 1.0};
 
 // Pontos quadrado interno
 Point(1) = {-rinner, rinner, 0, 1.0};
@@ -28,31 +23,26 @@ Point(3) = {rinner, -rinner, 0, 1.0};
 Point(4) = {-rinner, -rinner, 0, 1.0};
 
 // Pontos quadrado médio 1
-Point(5) = {-rmiddle1*cos45,  rmiddle1*cos45, 0, 1.0};
+Point(5) = {-rmiddle*cos45,  rmiddle*cos45, 0, 1.0};
 //+
-Point(6) = {rmiddle1*cos45,   rmiddle1*cos45, 0, 1.0};
+Point(6) = {rmiddle*cos45,   rmiddle*cos45, 0, 1.0};
 //+
-Point(7) = {rmiddle1*cos45,   -rmiddle1*cos45, 0, 1.0};
+Point(7) = {rmiddle*cos45,   -rmiddle*cos45, 0, 1.0};
 //+
-Point(8) = {-rmiddle1*cos45,  -rmiddle1*cos45, 0, 1.0};
+Point(8) = {-rmiddle*cos45,  -rmiddle*cos45, 0, 1.0};
 
-// Pontos quadrado médio 2
-Point(9) = {-rmiddle2*cos45,  rmiddle2*cos45, 0, 1.0};
-//+
-Point(10) = {rmiddle2*cos45,   rmiddle2*cos45, 0, 1.0};
-//+
-Point(11) = {rmiddle2*cos45,   -rmiddle2*cos45, 0, 1.0};
-//+
-Point(12) = {-rmiddle2*cos45,  -rmiddle2*cos45, 0, 1.0};
 
 // Pontos quadrado externo
-Point(13) = {-rout*cos45,  rout*cos45, 0, 1.0};
+Point(9) = {-rout*cos45,  rout*cos45, 0, 1.0};
 //+
-Point(14) = {rout*cos45,   rout*cos45, 0, 1.0};
+Point(10) = {rout*cos45,   rout*cos45, 0, 1.0};
 //+
-Point(15) = {rout*cos45,   -rout*cos45, 0, 1.0};
+Point(11) = {rout*cos45,   -rout*cos45, 0, 1.0};
 //+
-Point(16) = {-rout*cos45,  -rout*cos45, 0, 1.0};
+Point(12) = {-rout*cos45,  -rout*cos45, 0, 1.0};
+
+// Centro arco de circunferência
+Point(13) = {0, 0, 0, 1.0};
 
 //Linhas quadrado interno
 Line(1) = {3, 4};
@@ -63,7 +53,7 @@ Line(3) = {1, 2};
 //+
 Line(4) = {2, 3};
 
-// Linhas diagonais quadrado médio 1
+// Linhas quadrado médio
 Line(5) = {3, 7};
 //+
 Line(6) = {4, 8};
@@ -72,26 +62,16 @@ Line(7) = {1, 5};
 //+
 Line(8) = {2, 6};
 
-// Linhas diagonais quadrado médio 2
-Line(25) = {5, 9};
-//+
-Line(26) = {6, 10};
-//+
-Line(27) = {7, 11};
-//+
-Line(28) = {8, 12};
 
-// Linhas diagonais quadrado externo
-Line(9)  = {11, 15};
+// Linhas quadrado externo
+Line(9)  = {7, 11};
 //+
-Line(10) = {12, 16};
+Line(10) = {8, 12};
 //+
-Line(11) = {9, 13};
+Line(11) = {5, 9};
 //+
-Line(12) = {10, 14};
+Line(12) = {6, 10};
 
-
-/*
 
 // Circunferência middle 
 Circle(13) = {8, 13, 5};
@@ -155,8 +135,8 @@ Recombine Surface {1, 2, 3, 4, 5, 6, 7, 8, 9};
 a = 60;
 c1 = 60;
 c2 = a;
-b1 = 1.5*a;50
-b2 = 1.5*a;
+b1 = 1.8*a;
+b2 = a;
 
     // quadrado
 Transfinite Curve {2, 3, 4, 1}      = a Using Progression   1;
@@ -189,10 +169,9 @@ Transfinite Curve {9, 20, 10, 16}   = c2 Using Progression  1;
 
     // diagonais internas
 Transfinite Curve {7, 8, 5, 6}      = b1 Using Progression  1;
+
     // diagonais externas
-Transfinite Curve {11, 12, 9, 10} = b2 Using Progression 1;
-    // diagonais externas
-Transfinite Curve {11, 12, 9, 10}   = b2 Using Progression  1;
+Transfinite Curve {11, 12, 9, 10}   = b2 Using Progression  1.03;
 
 Transfinite Surface {1};
 //+
@@ -267,8 +246,8 @@ Transfinite Curve {1, 5, 11, 6} = c Using Progression 1;
 Transfinite Curve {2, 6, 12, 7} = c Using Progression 1;
 
     //diagonais
-Transfinite Curve {7, 8, 5, 6}  = b Using Progression 1.03;
-//+
+Transfinite Curve {7, 8, 5, 6}  = b Using Progression 1.5;
+
 
 //+
 Transfinite Surface {2};
@@ -300,86 +279,5 @@ Mesh 3;*///+
 
 //+
 
-// Círculo médio 1
-Circle(13) = {8, 0, 5};
-//+
-Circle(14) = {5, 0, 6};
-//+
-Circle(15) = {6, 0, 7};
-//+
-Circle(16) = {7, 0, 8};
-
-
-// Círculo médio 2
-Circle(17) = {12, 0, 9};
-//+
-Circle(18) = {9, 0, 10};
-//+
-Circle(19) = {10, 0, 11};
-//+
-Circle(20) = {11, 0, 12};
-
-// Círculo externo
-Circle(21) = {16, 0, 13};
-//+
-Circle(22) = {13, 0, 14};
-//+
-Circle(23) = {14, 0, 15};
-//+
-Circle(24) = {15, 0, 16};
-
-
-// Definindo superfícies
-Curve Loop(1) = {2, 3, 4, 1};
-// +
-Plane Surface(1) = {1};
-//+
-Curve Loop(2) = {14, -8, -3, 7};
-//+
-Plane Surface(2) = {2};
-//+
-Curve Loop(3) = {8, 15, -5, -4};
-//+
-Plane Surface(3) = {3};
-//+
-Curve Loop(4) = {5, 16, -6, -1};
-//+
-Plane Surface(4) = {4};
-//+
-Curve Loop(5) = {6, 13, -7, -2};
-//+
-Plane Surface(5) = {5};
-//+
-Curve Loop(6) = {18, 19, 20, 17};
-//+
-Curve Loop(7) = {13, 14, 15, 16};
-//+
-Plane Surface(6) = {6, 7};
-//+
-Curve Loop(8) = {10, 21, -11, -17};
-//+
-Plane Surface(7) = {8};
-//+
-Curve Loop(9) = {11, 22, -12, -18};
-//+
-Plane Surface(8) = {9};
-//+
-Curve Loop(10) = {12, 23, -9, -19};
-//+
-Plane Surface(9) = {10};
-//+
-Curve Loop(11) = {9, 24, -10, -20};
-//+
-Plane Surface(10) = {11};
-//+
-Recombine Surface {1, 5, 2, 3, 4, 6, 8, 9, 10, 7};
-
-// Definindo malha
-a = 10;
-c2 = a;
-b1 = 1.8*a;
-b2 = a;
-
-    // quadrado
 
 

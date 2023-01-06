@@ -10,14 +10,16 @@ monopoleFlow/
 # OpenFoam ignore
 *.gz
 log.*
+log[0-9].*
 postProcessing
 *~
 processor*
-# [0-9]*
-# [0-9]*.[0-9]*
+[0-9]*
+[0-9]*.[0-9]*
 !0.org
 constant/extendedFeatureEdgeMesh
 *.eMesh
+polyMesh/
 constant/polyMesh/*
 !constant/polyMesh/blockMeshDict
 constant/cellToRegion

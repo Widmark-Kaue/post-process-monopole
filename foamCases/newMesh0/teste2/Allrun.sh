@@ -9,7 +9,7 @@ source $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 foamCleanTutorials
 
-cp -ar ../../mesh/msh/teste.msh .
+cp -ar ../../../mesh/msh/teste.msh .
 
 restore0Dir
 runApplication gmshToFoam teste.msh

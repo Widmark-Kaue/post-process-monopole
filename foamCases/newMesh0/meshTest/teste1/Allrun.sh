@@ -7,9 +7,9 @@ cat $FOAM_RUN
 source $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 
-foamCleanTutorials
+foamCleanTuturials
 
-cp -ar ../../../mesh/msh/teste.msh .
+cp -ar ../../mesh/msh/teste.msh .
 
 restore0Dir
 runApplication gmshToFoam teste.msh

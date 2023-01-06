@@ -9,10 +9,10 @@ source $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 foamCleanTutorials
 
-cp -ar ../../mesh/msh/teste50ppw.msh .
+cp -ar ../../mesh/msh/teste.msh .
 
 restore0Dir
-runApplication gmshToFoam teste50ppw.msh
+runApplication gmshToFoam teste.msh
 runApplication changeDictionary
 runApplication decomposePar
 runParallel renumberMesh -overwrite

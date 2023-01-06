@@ -91,21 +91,21 @@ codedSource
     }
 }
  
-// acousticDampingSource
-// {
-//     type            acousticDampingSource;
-//     active          yes;//yes;
+acousticDampingSource
+{
+    type            acousticDampingSource;
+    active          yes;//yes;
  
-//     acousticDampingSourceCoeffs
-//     {
-//         timeStart        0.004;
-//         duration         1000;
-//         selectionMode    all;
-//         centre           (0 0 0);
-//         radius1          102;
-//         radius2          400;
-//         frequency        10;
-//         //w                20;
-//         URef             UMean;
-//     }
-// }
+    acousticDampingSourceCoeffs
+    {
+        timeStart        0.004;
+        duration         1000;
+        selectionMode    all;
+        centre           (0 0 0);
+        radius1          102;
+        radius2          400;
+        frequency        10;
+        //w                20;
+        URef             UMean;
+    }
+}

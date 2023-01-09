@@ -4,7 +4,7 @@ import sympy as sy
 import matplotlib.pyplot as plt
 
 from re import findall
-from pathlib import Path
+# from pathlib import Path
 from scipy.integrate import trapz
 from src.datadrive import PATH_DATA
 from scipy.signal import fftconvolve
@@ -12,6 +12,10 @@ from scipy.interpolate import interp1d
 from scipy.special import hankel2, hankel1
 
 
+
+'''
+Funções analíticas 
+'''
 def pressure(
     r: float or np.ndarray = None,
     t: float or np.ndarray = None,
@@ -262,6 +266,9 @@ def pressureFlow2(
 
     return pFlow, (Xplt, Yplt)
 
+'''
+Funções de import
+'''
 
 def importData(
     simulation: str,
@@ -271,9 +278,9 @@ def importData(
     case: str = 'monopole'
 ) -> tuple:
 
-    PATH_DATA_CASE = Path(PATH_DATA, case)
-    PROBES = Path(PATH_DATA_CASE, 'probes', test, simulation,str(time), 'p.txt')
-    FWH = Path(PATH_DATA_CASE, 'acousticData', simulation, 'FWH-time.dat')
+    PATH_DATA_CASE = PATH_DATA.joinpath(case)
+    PROBES = PATH_DATA_CASE.joinpath('probes', test, simulation,str(time), 'p.txt')
+    FWH = PATH_DATA_CASE.joinpath('acousticData', simulation, 'FWH-time.dat')
     FWH2 = FWH.with_name('FWH2-time.dat')
 
     toPa = 101325
@@ -328,6 +335,9 @@ def importData(
         print(f'Time = {tsim[pos1]} \nPos = {pos1}')
         return (p - toPa, pfwh, pfwh2)
 
+'''
+Funções de análise
+'''
 
 def rmsTime(
     tp: tuple,
@@ -389,6 +399,9 @@ def rmsSpacial(rp: tuple, tobs: float = 0.5, plot: bool = True) -> float:
 def phaseAmplitude():
     return 0
 
+'''
+Funções de plot
+'''
 
 def plotTime(
     FWH: tuple, FWH2: tuple, SIM: tuple, robs: float = None, title: str = None

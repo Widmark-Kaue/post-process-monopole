@@ -6,7 +6,7 @@ __pycache__/
 # My ignore
 monopole/
 monopoleFlow/
-tests/
+test/
 
 # OpenFoam ignore
 *.gz

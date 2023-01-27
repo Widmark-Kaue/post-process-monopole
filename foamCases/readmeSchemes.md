@@ -5,12 +5,12 @@
 - quadMesh : malha totalmente quadrada
 - circMesh : malha circular com elementos triangulares
 
-## Testes
-| Schemes    |   Teste 1    |   Teste 2     |
-|------------|--------------|-------------- |
-| ddtSchemes |Euler         |bakward        |
-| gradSchmes |Gauss linear  |Gauss linear   |
-| divSchmes  |VanLeer       |VanLeer        |
+## Testes (Esquemas temporais)
+| Schemes    |   Teste 1    |   Teste 2     | Teste 3           |
+|------------|--------------|-------------- |-------------------|
+| ddtSchemes |Euler         |bakward        | cranckNicolson 0.9|
+| gradSchmes |Gauss linear  |Gauss linear   | Gauss Linear      |
+| divSchmes  |VanLeer       |VanLeer        | VanLeer           |
 
 
 
